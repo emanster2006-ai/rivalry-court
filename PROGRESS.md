@@ -21,7 +21,10 @@ Last updated: 2026-10-08. Tests: API 7 passing, web 2 passing.
 - [x] Create/join group, group switcher, invite code shown once
 - [x] Create duel (admin), duel cards, history and Brier stats (`App.tsx`, `DuelCard.tsx`)
 - [x] Build, typecheck, lint and tests pass; login page renders at http://localhost:5173
-- [ ] Click through the signed-in screens in a browser (probabilities, scores, confirm/dispute) with two users
+- [x] Two-user click-through 2026-10-08: sign in, create group, join by code, create duel, sealed submissions (opponent hidden until deadline), reveal at deadline, admin posts score + both emailed, confirm, resolved, correct Brier (0.1225 / 0.160)
+- [ ] Not yet clicked in the UI: dispute, corrected score, void duel, captain duel, tie, 72-hour auto-confirm
+- [ ] Create-duel form resets its fields after any refresh (members list effect in `DuelCard.tsx`)
+- [ ] UI white-screens if the API payload lacks `responses` (happened with a stale API container); consider an error boundary
 - [ ] Mobile-first polish and empty/error states
 
 ## To verify / open items
@@ -35,3 +38,8 @@ Last updated: 2026-10-08. Tests: API 7 passing, web 2 passing.
 - AI opposing counsel (confidence before/after)
 - AI manager
 - Automatic FPL data import, once a permitted data source is confirmed
+
+## Dev notes
+- API container now runs uvicorn with `--reload` (it served stale code before and crashed the UI). Recreate with `docker-compose up -d api` after compose changes.
+- Docker here has no `docker compose` plugin; use `docker-compose`.
+- Test data in local DB: users claude-test@ and claude-test2@example.com, groups "Claude smoke test" and "UI test court".
