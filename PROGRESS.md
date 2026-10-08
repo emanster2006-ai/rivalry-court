@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-08. Tests: API 7 passing, web 2 passing.
+Last updated: 2026-10-08. Tests: API 12 passing, web 3 passing.
 
 ## Done (first release backend)
 - [x] Monorepo scaffold, docker compose, setup script, Makefile
@@ -26,11 +26,12 @@ Last updated: 2026-10-08. Tests: API 7 passing, web 2 passing.
 - [ ] Not yet clicked in the UI: void duel, tie, 72-hour auto-confirm
 - [x] Fixed: create-duel form no longer resets on refresh
 - [x] Added error boundary (`ErrorBoundary.tsx`) so a bad payload shows a reload screen, not a blank page
-- [ ] Mobile-first polish and empty/error states
+- [x] Phone layout checked at 375px: no horizontal overflow, tap targets at least 44px (was 18px for sign-out, section headers, source links)
+- [ ] Visual review on a real phone
 
 ## To verify / open items
 - [ ] Captain-duel scoring: `rules.captain_slot_points` exists; confirm it is used for captain duels, with tests for vice promotion, chips, and empty slots
-- [ ] Test gaps vs README list: exact deadline boundaries over HTTP, late submissions, correction notice windows
+- [x] Test gaps closed: deadline boundary (1s before / at deadline), outsiders and non-participants, void duel, repeat-dispute guard, exact 72h boundary (API: 12 tests)
 - [ ] CI (not set up)
 - [ ] Deploy plan
 
