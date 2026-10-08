@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-08. Tests: API 15 passing, web 3 passing.
+Last updated: 2026-10-08. Tests: API 15 passing, web 10 passing.
 
 ## Done (first release backend)
 - [x] Monorepo scaffold, docker compose, setup script, Makefile
