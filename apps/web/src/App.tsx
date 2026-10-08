@@ -30,7 +30,8 @@ export default function App() {
   }, [])
 
   const refresh = useCallback(async (groupId?: string) => {
-    const [profile, groupList] = await Promise.all([api<Person>('/me'), api<Group[]>('/groups')])
+    const profile = await api<Person>('/me')
+    const groupList = await api<Group[]>('/groups')
     setMe(profile); setGroups(groupList)
     const id = groupId || selected || groupList[0]?.id
     if (id && groupList.some(g => g.id === id)) {
@@ -41,6 +42,7 @@ export default function App() {
       ])
       setMembers(people); setDuels(duelList); setHistory(records)
     } else { setSelected(''); setMembers([]); setDuels([]); setHistory({}) }
+    setError('')
   }, [selected])
 
   useEffect(() => { if (session) refresh().catch(err => setError(String(err))) }, [session, refresh])
@@ -69,7 +71,7 @@ export default function App() {
 
   return <main className="shell">
     <header><div className="brand">RIVALRY <span>COURT</span></div><div className="account"><span>{me?.email}</span><button className="text-button" onClick={() => auth.signOut()}>Sign out</button></div></header>
-    {error && <p className="error" role="alert">{error}</p>}
+    {error && <div className="error" role="alert">{error} <button className="secondary" onClick={() => refresh().catch(err => setError(String(err)))}>Try again</button></div>}
     <section className="panel group-panel"><div><p className="eyebrow">YOUR COURT</p><h1>Make the call before kickoff.</h1></div>
       <div className="group-controls"><label>Group<select value={selected} onChange={event => { setSelected(event.target.value); refresh(event.target.value).catch(err => setError(String(err))) }}>
         {groups.length === 0 && <option value="">No group yet</option>}
