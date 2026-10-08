@@ -124,3 +124,88 @@ def test_auto_confirmation_and_tie(flow):
     assert call(client, 1, "GET", path).json()["status"] == "void"
     stats = call(client, 0, "GET", f"/groups/{group['id']}/history").json()
     assert stats[str(ids[0])]["sample_size"] == 0
+
+
+SOURCE = "https://fantasy.premierleague.com/"
+
+
+def post_score(client, user, path, a, b):
+    return call(client, user, "POST", path + "/scores", {"score_a": a, "score_b": b, "source_url": SOURCE})
+
+
+def test_deadline_boundary_and_outsiders(flow):
+    client, _, clock, _ = flow
+    group, duel, deadline = setup_duel(flow)
+    path = f"/duels/{duel['id']}"
+    # A non-member cannot see the duel or its group.
+    assert call(client, 2, "POST", path + "/submissions", {"probability_pct": 50}).status_code == 404
+    assert call(client, 2, "GET", f"/groups/{group['id']}/duels").status_code == 404
+    # One second before the deadline is accepted; the deadline instant is not.
+    clock[0] = deadline - timedelta(seconds=1)
+    assert call(client, 0, "POST", path + "/submissions", {"probability_pct": 50}).status_code == 201
+    clock[0] = deadline
+    assert call(client, 1, "POST", path + "/submissions", {"probability_pct": 50}).status_code == 409
+
+
+def test_non_participant_member_cannot_submit(flow):
+    client, *_ = flow
+    group, duel, _ = setup_duel(flow)
+    path = f"/duels/{duel['id']}"
+    invite = call(client, 0, "POST", "/groups", {"name": "Second"}).json()["invite_code"]
+    assert call(client, 2, "POST", "/groups/join", {"invite_code": invite}).status_code == 200
+    # Person 2 belongs only to a different group, so this duel is invisible to them.
+    assert call(client, 2, "POST", path + "/submissions", {"probability_pct": 50}).status_code == 404
+    # A third member of the duel's own group can read the duel but not submit.
+    assert call(client, 2, "POST", "/groups/join", {"invite_code": group["invite_code"]}).status_code == 200
+    assert call(client, 2, "GET", path).status_code == 200
+    assert call(client, 2, "POST", path + "/submissions", {"probability_pct": 50}).status_code == 403
+
+
+def test_void_duel_blocks_submissions_and_stats(flow):
+    client, ids, *_ = flow
+    group, duel, _ = setup_duel(flow)
+    path = f"/duels/{duel['id']}"
+    assert call(client, 1, "POST", path + "/void", {"reason": "Wrong deadline"}).status_code == 403
+    voided = call(client, 0, "POST", path + "/void", {"reason": "Wrong deadline"})
+    assert voided.json()["status"] == "void"
+    assert voided.json()["void_reason"] == "Wrong deadline"
+    assert call(client, 0, "POST", path + "/void", {"reason": "Again please"}).status_code == 409
+    assert call(client, 1, "POST", path + "/submissions", {"probability_pct": 50}).status_code == 409
+    history = call(client, 0, "GET", f"/groups/{group['id']}/history").json()
+    assert history[str(ids[0])]["sample_size"] == 0
+
+
+def test_repeat_dispute_of_unchanged_score_is_rejected(flow):
+    client, _, clock, _ = flow
+    _, duel, deadline = setup_duel(flow)
+    path = f"/duels/{duel['id']}"
+    for user in (0, 1):
+        call(client, user, "POST", path + "/submissions", {"probability_pct": 50})
+    clock[0] = deadline
+    first = post_score(client, 0, path, 10, 8).json()["scores"][-1]["id"]
+    reason = {"reason": "The entered gameweek value is wrong"}
+    assert call(client, 1, "POST", path + f"/scores/{first}/dispute", reason).json()["status"] == "disputed"
+    # Admin reaffirms identical values: a new revision, but B may not dispute the same numbers again.
+    second = post_score(client, 0, path, 10, 8).json()["scores"][-1]["id"]
+    assert call(client, 1, "POST", path + f"/scores/{second}/dispute", reason).status_code == 409
+    assert call(client, 1, "POST", path + f"/scores/{second}/confirm").json()["status"] == "resolved"
+
+
+def test_72_hour_boundary(flow):
+    client, _, clock, factory = flow
+    _, duel, deadline = setup_duel(flow)
+    path = f"/duels/{duel['id']}"
+    for user in (0, 1):
+        call(client, user, "POST", path + "/submissions", {"probability_pct": 50})
+    clock[0] = deadline
+    post_score(client, 0, path, 10, 8)
+    from rivalry.models import ScoreNotice
+    with factory() as db:
+        notice_at = db.query(ScoreNotice).one().created_at.replace(tzinfo=UTC)
+    clock[0] = notice_at + timedelta(hours=72) - timedelta(seconds=1)
+    assert call(client, 1, "GET", path).json()["status"] == "awaiting_confirmation"
+    clock[0] = notice_at + timedelta(hours=72)
+    assert call(client, 1, "GET", path).json()["status"] == "resolved"
+    # The window is closed: a late confirmation is refused.
+    revision = call(client, 1, "GET", path).json()["scores"][-1]["id"]
+    assert call(client, 1, "POST", path + f"/scores/{revision}/confirm").status_code == 409
