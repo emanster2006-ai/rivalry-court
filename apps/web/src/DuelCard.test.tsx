@@ -76,3 +76,16 @@ test('the admin can void an open duel', () => {
   fireEvent.click(screen.getByText('Void duel'))
   expect(act).toHaveBeenCalledWith('/duels/duel/void', { reason: 'Deadline was moved' })
 })
+
+test('the slider starts at the saved probability and updates after a revision', () => {
+  const open = duel({ status: 'open', deadline_at: new Date(Date.now() + 600000).toISOString(), probabilities: { a: 70 } })
+  const act = vi.fn()
+  const { rerender } = render(<DuelCard duel={open} me={a} members={members} admin={false} busy={false} act={act} />)
+  const slider = screen.getByRole('slider') as HTMLInputElement
+  expect(slider.value).toBe('70')
+  fireEvent.change(slider, { target: { value: '85' } })
+  rerender(<DuelCard duel={{ ...open, probabilities: { a: 70 } }} me={a} members={members} admin={false} busy={false} act={act} />)
+  expect(slider.value).toBe('85')
+  rerender(<DuelCard duel={{ ...open, probabilities: { a: 80 } }} me={a} members={members} admin={false} busy={false} act={act} />)
+  expect(slider.value).toBe('80')
+})
