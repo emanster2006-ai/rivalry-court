@@ -6,8 +6,7 @@ if [ ! -f .env ]; then
   if command -v openssl >/dev/null 2>&1; then
     jwt_secret="$(openssl rand -hex 32)"
     db_password="$(openssl rand -hex 24)"
-    auth_password="$(openssl rand -hex 24)"
-    sed -i.bak "s|AUTH_JWT_SECRET=replace-with-a-long-random-secret|AUTH_JWT_SECRET=$jwt_secret|; s|POSTGRES_PASSWORD=change-me|POSTGRES_PASSWORD=$db_password|; s|AUTH_DB_PASSWORD=change-me-too|AUTH_DB_PASSWORD=$auth_password|; s|rivalry:change-me@db|rivalry:$db_password@db|" .env
+    sed -i.bak "s|AUTH_JWT_SECRET=replace-with-a-long-random-secret|AUTH_JWT_SECRET=$jwt_secret|; s|POSTGRES_PASSWORD=change-me|POSTGRES_PASSWORD=$db_password|; s|rivalry:change-me@db|rivalry:$db_password@db|" .env
     rm .env.bak
   fi
 fi
