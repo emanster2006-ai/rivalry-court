@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-08. Tests: API 18 passing with PostgreSQL (17 passing and one PostgreSQL check skipped without it), web 13 passing.
+Last updated: 2026-10-08. Tests: API 19 passing with PostgreSQL (18 passing and one PostgreSQL check skipped without it), web 14 passing.
 
 ## Done (first release backend)
 - [x] Monorepo scaffold, docker compose, setup script, Makefile
@@ -8,6 +8,7 @@ Last updated: 2026-10-08. Tests: API 18 passing with PostgreSQL (17 passing and 
 - [x] Auth: bearer JWT validation (audience `authenticated`), users created on first sight
 - [x] Groups: create, join by invite code (hashed), list members
 - [x] Group admins can replace a lost invite code; the previous code stops working
+- [x] Unique editable usernames replace emails in group member lists, duels, and history; email stays private for login and score notices
 - [x] Duels: create (admin sets deadline), list, read with per-viewer privacy
 - [x] Sealed probability submissions (0–100, 5-pt steps, append-only, deadline enforced)
 - [x] Void duel; auto-void on missing submission or tie

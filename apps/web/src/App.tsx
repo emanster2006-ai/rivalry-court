@@ -9,6 +9,7 @@ import './style.css'
 export default function App() {
   const [session, setSession] = useState<Session | null>(null)
   const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [sent, setSent] = useState(false)
   const [me, setMe] = useState<Person | null>(null)
   const [groups, setGroups] = useState<Group[]>([])
@@ -32,7 +33,7 @@ export default function App() {
   const refresh = useCallback(async (groupId?: string) => {
     const profile = await api<Person>('/me')
     const groupList = await api<Group[]>('/groups')
-    setMe(profile); setGroups(groupList)
+    setMe(profile); setGroups(groupList); setUsername(profile.username || '')
     const id = groupId || selected || groupList[0]?.id
     if (id && groupList.some(g => g.id === id)) {
       setSelected(id)
@@ -70,8 +71,13 @@ export default function App() {
       {error && <p className="error" role="alert">{error}</p>}</section></main>
 
   return <main className="shell">
-    <header><div className="brand">RIVALRY <span>COURT</span></div><div className="account"><span>{me?.email}</span><button className="text-button" onClick={() => auth.signOut()}>Sign out</button></div></header>
+    <header><div className="brand">RIVALRY <span>COURT</span></div><div className="account"><span>{me?.display_name}</span><button className="text-button" onClick={() => auth.signOut()}>Sign out</button></div></header>
     {error && <div className="error" role="alert">{error} <button className="secondary" onClick={() => refresh().catch(err => setError(String(err)))}>Try again</button></div>}
+    <section className="panel profile-panel"><div><p className="eyebrow">YOUR NAME IN COURT</p><p>{me?.username ? 'Friends see this username on duels and records.' : 'Pick a username so friends see your name instead of a player number.'}</p></div>
+      <form onSubmit={event => { event.preventDefault(); run(() => api('/me', 'PATCH', { username })) }}>
+        <label>Username<input value={username} onChange={event => setUsername(event.target.value)} minLength={3} maxLength={24} pattern="[A-Za-z0-9_]+" autoComplete="nickname" placeholder="your_name" required /></label>
+        <button disabled={busy || username.toLowerCase() === me?.username}>Save</button>
+      </form></section>
     <section className="panel group-panel"><div><p className="eyebrow">YOUR COURT</p><h1>Make the call before kickoff.</h1></div>
       <div className="group-controls"><label>Group<select value={selected} onChange={event => { setSelected(event.target.value); refresh(event.target.value).catch(err => setError(String(err))) }}>
         {groups.length === 0 && <option value="">No group yet</option>}
@@ -93,7 +99,7 @@ export default function App() {
       <div className="duel-grid">{duels.map(duel => <DuelCard key={duel.id} duel={duel} me={me!} members={members} admin={group.role === 'admin'} busy={busy} act={(path, body) => run(() => api(path, 'POST', body))} />)}</div>
       <section className="section-heading"><div><p className="eyebrow">THE RECORD</p><h2>History &amp; calibration</h2></div></section>
       <div className="stats-grid">{Object.entries(history).map(([id, record]) => <div className="panel stat" key={id}>
-        <h3>{record.email}{id === me?.id && <small> You</small>}</h3><div className="stat-row"><strong>{record.wins}–{record.losses}</strong><span>W–L</span></div>
+        <h3>{record.display_name}{id === me?.id && <small> You</small>}</h3><div className="stat-row"><strong>{record.wins}–{record.losses}</strong><span>W–L</span></div>
         <div className="stat-row"><strong>{record.sample_size}</strong><span>Resolved predictions</span></div>
         <div className="stat-row"><strong>{record.mean_brier === null ? '—' : record.mean_brier.toFixed(3)}</strong><span>Mean Brier · lower is better</span></div>
         {record.history.length > 0 && <details><summary>Activity ({record.history.length})</summary><ul>{record.history.map(item => <li key={item.duel_id}>{item.gameweek} · {item.status === 'void' ? `Void: ${item.void_reason}` : `${item.won ? 'Won' : 'Lost'} · ${item.probability_pct}% · Brier ${item.brier?.toFixed(3)}`}</li>)}</ul></details>}
