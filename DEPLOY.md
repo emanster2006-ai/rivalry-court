@@ -24,6 +24,13 @@ Open items before this works:
 
 Nothing here has been run against a real host yet. It is a checklist for the first deployment.
 
+## Chosen setup (free)
+- **Supabase** project `gfgbawwuwacaduneaxaa`: sign-in + Postgres. Migration `0003` turns on row-level security so the public REST API exposes nothing; the game API connects directly as the table owner.
+- **Render** from `render.yaml`: `rivalry-court-api` (Docker, free) and `rivalry-court-web` (static, free).
+- **Brevo** SMTP for sign-in links (set in Supabase) and score notices (set in Render).
+- Mailer now supports `SMTP_STARTTLS=true`, required by Brevo.
+- If a Render service name is taken, edit the URLs in `render.yaml` (`WEB_URL`, `VITE_API_URL`) to match.
+
 ## What has to run
 | Piece | Image / command | Notes |
 |---|---|---|
