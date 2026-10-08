@@ -4,6 +4,7 @@ import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from rivalry.config import settings
@@ -31,8 +32,17 @@ def current_user(
     if user is None:
         user = User(id=user_id, email=email)
         db.add(user)
-        db.commit()
-        db.refresh(user)
+        try:
+            db.commit()
+        except IntegrityError:
+            # The first page load requests /me and /groups together. Another
+            # request may have inserted this user after our initial lookup.
+            db.rollback()
+            user = db.get(User, user_id)
+            if user is None:
+                raise
+        else:
+            db.refresh(user)
     elif user.email != email:
         user.email = email
         db.commit()

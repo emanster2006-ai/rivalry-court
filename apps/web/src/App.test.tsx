@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, expect, test, vi } from 'vitest'
 import App from './App'
 import { api, auth } from './client'
@@ -11,7 +11,7 @@ vi.mock('./client', () => ({
   api: vi.fn(),
 }))
 
-beforeEach(() => vi.clearAllMocks())
+beforeEach(() => { cleanup(); vi.clearAllMocks() })
 
 test('email sign-in uses a magic link', async () => {
   vi.mocked(auth.getSession).mockResolvedValue({ data: { session: null }, error: null })
@@ -41,4 +41,23 @@ test('a participant can see and revise only their own pre-deadline probability',
   fireEvent.change(screen.getByLabelText('Your win probability'), { target: { value: '75' } })
   fireEvent.click(screen.getByText('Lock / revise'))
   await waitFor(() => expect(api).toHaveBeenCalledWith('/duels/duel/submissions', 'POST', { probability_pct: 75 }))
+})
+
+test('a signed-in member can retry after a temporary API failure', async () => {
+  vi.mocked(auth.getSession).mockResolvedValue({ data: { session: { access_token: 'test' } }, error: null } as never)
+  let failing = true
+  vi.mocked(api).mockImplementation(async (path: string) => {
+    if (path === '/me') {
+      if (failing) throw new TypeError('Failed to fetch')
+      return { id: 'a', email: 'a@example.com' }
+    }
+    if (path === '/groups') return []
+    return {}
+  })
+  render(<App />)
+  await waitFor(() => expect(screen.getByRole('alert').textContent).toContain('Failed to fetch'))
+  failing = false
+  fireEvent.click(screen.getByText('Try again'))
+  await waitFor(() => expect(screen.queryByRole('alert')).toBeNull())
+  expect(screen.getByText('a@example.com')).toBeTruthy()
 })

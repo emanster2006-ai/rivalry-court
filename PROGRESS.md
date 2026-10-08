@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-08. Tests: API 16 passing with PostgreSQL (15 passing and one PostgreSQL check skipped without it), web 10 passing.
+Last updated: 2026-10-08. Tests: API 17 passing with PostgreSQL (16 passing and one PostgreSQL check skipped without it), web 11 passing.
 
 ## Done (first release backend)
 - [x] Monorepo scaffold, docker compose, setup script, Makefile
@@ -13,6 +13,7 @@ Last updated: 2026-10-08. Tests: API 16 passing with PostgreSQL (15 passing and 
 - [x] Score entry by admin with source link, email notice to both players
 - [x] Confirm / dispute with reason, repeat-dispute block, corrected revisions
 - [x] 72-hour auto-confirm via `rules.resolution_state`
+- [x] First sign-in survives simultaneous profile/group requests; a temporary API error has a Retry action in the web app
 - [x] Group history: wins, losses, sample size, mean Brier
 - [x] Tests: rules, private access, deadline revisions, no-show, dispute/correction, auto-confirm, tie
 
