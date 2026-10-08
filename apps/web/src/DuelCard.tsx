@@ -25,7 +25,9 @@ export function CreateDuelForm({ members, busy, onCreate }: { members: Person[];
 }
 
 export function DuelCard({ duel, me, members, admin, busy, act }: { duel: Duel; me: Person; members: Person[]; admin: boolean; busy: boolean; act: (path: string, body?: unknown) => void }) {
-  const [probability, setProbability] = useState(50)
+  const savedProbability = duel.probabilities[me.id]
+  const [probability, setProbability] = useState(savedProbability ?? 50)
+  useEffect(() => setProbability(savedProbability ?? 50), [me.id, savedProbability])
   const [scoreA, setScoreA] = useState(''); const [scoreB, setScoreB] = useState(''); const [source, setSource] = useState('')
   const [reason, setReason] = useState(''); const [voidReason, setVoidReason] = useState('')
   const a = members.find(m => m.id === duel.member_a_id)?.email || 'Side A'

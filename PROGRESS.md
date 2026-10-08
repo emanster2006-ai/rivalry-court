@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-08. Tests: API 18 passing with PostgreSQL (17 passing and one PostgreSQL check skipped without it), web 12 passing.
+Last updated: 2026-10-08. Tests: API 18 passing with PostgreSQL (17 passing and one PostgreSQL check skipped without it), web 13 passing.
 
 ## Done (first release backend)
 - [x] Monorepo scaffold, docker compose, setup script, Makefile
@@ -27,6 +27,7 @@ Last updated: 2026-10-08. Tests: API 18 passing with PostgreSQL (17 passing and 
 - [x] Dispute -> corrected score -> confirm -> resolved, clicked in UI as the non-admin participant (captain duel)
 - [ ] Not yet clicked in the UI: void duel, tie, 72-hour auto-confirm
 - [x] Fixed: create-duel form no longer resets on refresh
+- [x] Saved probability now sets the slider value; a refresh with unchanged data keeps an unsaved edit
 - [x] Added error boundary (`ErrorBoundary.tsx`) so a bad payload shows a reload screen, not a blank page
 - [x] Phone layout checked at 375px: no horizontal overflow, tap targets at least 44px (was 18px for sign-out, section headers, source links)
 - [ ] Visual review on a real phone
