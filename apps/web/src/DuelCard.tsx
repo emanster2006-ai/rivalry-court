@@ -8,7 +8,11 @@ function date(value: string) { return new Date(value).toLocaleString() }
 export function CreateDuelForm({ members, busy, onCreate }: { members: Person[]; busy: boolean; onCreate: (body: unknown) => void }) {
   const [a, setA] = useState(''); const [b, setB] = useState(''); const [type, setType] = useState('gameweek_points')
   const [gameweek, setGameweek] = useState(''); const [deadline, setDeadline] = useState('')
-  useEffect(() => { setA(members[0]?.id || ''); setB(members[1]?.id || '') }, [members])
+  useEffect(() => {
+    const has = (id: string) => members.some(m => m.id === id)
+    setA(current => has(current) ? current : members[0]?.id || '')
+    setB(current => has(current) ? current : members[1]?.id || '')
+  }, [members])
   return <form className="panel create-duel" onSubmit={event => { event.preventDefault(); onCreate({ member_a_id: a, member_b_id: b, claim_type: type, gameweek, deadline_at: new Date(deadline).toISOString() }) }}>
     <div><p className="eyebrow">ADMIN</p><h3>New duel</h3><p>Enter the official FPL deadline in your local time. It locks once a prediction is submitted.</p></div>
     <div className="form-grid"><label>Side A<select value={a} onChange={event => setA(event.target.value)} required>{members.map(m => <option value={m.id} key={m.id}>{m.email}</option>)}</select></label>

@@ -22,9 +22,10 @@ Last updated: 2026-10-08. Tests: API 7 passing, web 2 passing.
 - [x] Create duel (admin), duel cards, history and Brier stats (`App.tsx`, `DuelCard.tsx`)
 - [x] Build, typecheck, lint and tests pass; login page renders at http://localhost:5173
 - [x] Two-user click-through 2026-10-08: sign in, create group, join by code, create duel, sealed submissions (opponent hidden until deadline), reveal at deadline, admin posts score + both emailed, confirm, resolved, correct Brier (0.1225 / 0.160)
-- [ ] Not yet clicked in the UI: dispute, corrected score, void duel, captain duel, tie, 72-hour auto-confirm
-- [ ] Create-duel form resets its fields after any refresh (members list effect in `DuelCard.tsx`)
-- [ ] UI white-screens if the API payload lacks `responses` (happened with a stale API container); consider an error boundary
+- [x] Dispute -> corrected score -> confirm -> resolved, clicked in UI as the non-admin participant (captain duel)
+- [ ] Not yet clicked in the UI: void duel, tie, 72-hour auto-confirm
+- [x] Fixed: create-duel form no longer resets on refresh
+- [x] Added error boundary (`ErrorBoundary.tsx`) so a bad payload shows a reload screen, not a blank page
 - [ ] Mobile-first polish and empty/error states
 
 ## To verify / open items
