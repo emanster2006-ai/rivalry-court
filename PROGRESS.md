@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-08. Tests: API 15 passing, web 10 passing.
+Last updated: 2026-10-08. Tests: API 16 passing with PostgreSQL (15 passing and one PostgreSQL check skipped without it), web 10 passing.
 
 ## Done (first release backend)
 - [x] Monorepo scaffold, docker compose, setup script, Makefile
@@ -30,7 +30,7 @@ Last updated: 2026-10-08. Tests: API 15 passing, web 10 passing.
 - [ ] Visual review on a real phone
 
 ## To verify / open items
-- [ ] Captain-duel scoring: `rules.captain_slot_points` exists; confirm it is used for captain duels, with tests for vice promotion, chips, and empty slots
+- [x] Captain-duel scoring: the admin enters FPL's official captain-slot points; `rules.captain_slot_points` documents and tests vice promotion, chip multipliers, and empty slots. Automatic FPL scoring is outside this release.
 - [x] Test gaps closed: deadline boundary (1s before / at deadline), outsiders and non-participants, void duel, repeat-dispute guard, exact 72h boundary (API: 12 tests)
 - [x] CI workflow written (`.github/workflows/ci.yml`: API ruff+pytest, web tsc+lint+test+build). API steps verified in a clean venv; not yet run on GitHub (repo not pushed)
 - [x] Production config guard: app refuses to start with APP_ENV=production and a placeholder JWT secret/DB password or non-https WEB_URL (tests added)
@@ -49,5 +49,6 @@ Last updated: 2026-10-08. Tests: API 15 passing, web 10 passing.
 
 ## Dev notes
 - API container now runs uvicorn with `--reload` (it served stale code before and crashed the UI). Recreate with `docker-compose up -d api` after compose changes.
-- Docker here has no `docker compose` plugin; use `docker-compose`.
+- `docker compose up -d --build` now works here using the installed Compose CLI plugin; all five services started and the API health check passed.
+- Vitest was updated to 4.1.11; `npm audit` now reports zero advisories.
 - Test data in local DB: users claude-test@ and claude-test2@example.com, groups "Claude smoke test" and "UI test court".

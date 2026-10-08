@@ -35,7 +35,7 @@ Nothing here has been run against a real host yet. It is a checklist for the fir
 ## Environment (production)
 - `APP_ENV=production` — the API refuses to start with placeholder secrets or a non-https `WEB_URL`.
 - `AUTH_JWT_SECRET` — random, 32+ characters, **identical** for GoTrue (`GOTRUE_JWT_SECRET`) and the API.
-- `DATABASE_URL`, `POSTGRES_*`, `AUTH_DB_PASSWORD` — real passwords, never the `change-me` defaults.
+- `DATABASE_URL`, `POSTGRES_*` — real passwords, never the `change-me` defaults.
 - `WEB_URL` — the public https address of the web app. Used for CORS and magic-link redirects (`GOTRUE_SITE_URL`, `GOTRUE_URI_ALLOW_LIST`).
 - `AUTH_URL` / `API_URL` — public https addresses the browser calls.
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `MAIL_FROM` — a real mail provider. Used by GoTrue (magic links) and the API (score notices). Mailpit is local only.
