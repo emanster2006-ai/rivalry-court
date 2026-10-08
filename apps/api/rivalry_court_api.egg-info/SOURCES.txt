@@ -1,0 +1,9 @@
+pyproject.toml
+rivalry/__init__.py
+rivalry/api.py
+rivalry_court_api.egg-info/PKG-INFO
+rivalry_court_api.egg-info/SOURCES.txt
+rivalry_court_api.egg-info/dependency_links.txt
+rivalry_court_api.egg-info/requires.txt
+rivalry_court_api.egg-info/top_level.txt
+tests/test_health.py
