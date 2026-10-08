@@ -1,0 +1,52 @@
+import uuid
+
+import jwt
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from rivalry.config import settings
+from rivalry.db import get_db
+from rivalry.models import User
+
+bearer = HTTPBearer()
+
+
+def current_user(
+    token: HTTPAuthorizationCredentials = Depends(bearer), db: Session = Depends(get_db)
+) -> User:
+    try:
+        claims = jwt.decode(
+            token.credentials,
+            settings.auth_jwt_secret,
+            algorithms=["HS256"],
+            audience="authenticated",
+        )
+        user_id = uuid.UUID(claims["sub"])
+        email = claims["email"].lower()
+    except (jwt.PyJWTError, KeyError, ValueError, TypeError) as exc:
+        raise HTTPException(401, "Invalid authentication token") from exc
+    user = db.get(User, user_id)
+    if user is None:
+        user = User(id=user_id, email=email)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    elif user.email != email:
+        user.email = email
+        db.commit()
+    return user
+
+
+def membership(db: Session, group_id: uuid.UUID, user_id: uuid.UUID, admin: bool = False):
+    from rivalry.models import Membership
+
+    row = db.scalar(
+        select(Membership).where(Membership.group_id == group_id, Membership.user_id == user_id)
+    )
+    if row is None:
+        raise HTTPException(404, "Group not found")
+    if admin and row.role != "admin":
+        raise HTTPException(403, "Group admin required")
+    return row
