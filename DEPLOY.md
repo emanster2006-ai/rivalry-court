@@ -14,7 +14,7 @@ Checked against the providers' own pages where possible; blog comparisons disagr
 **Best fit for "free and safe" at friend-group scale (not yet built or tested):**
 Supabase Free (sign-in + database) + Render free web service (API) + a free static host for the web app + Brevo free SMTP for emails.
 Open items before this works:
-1. The API verifies sign-in tokens with a shared HS256 secret. Check which signing method the hosted Supabase project uses and adapt `rivalry/auth.py` if it uses public keys instead.
+1. ~~Token verification~~ **Done:** new Supabase projects sign tokens with public keys (docs: signing keys, ES256). Set `AUTH_JWKS_URL=https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json` on the API and it verifies against Supabase's published keys (the shared secret is then rejected). Without that setting the local GoTrue shared-secret mode is used. Covered by tests with a forged-token case; not yet tried against a real Supabase project.
 2. The API sends score notices over SMTP from Render. Use a provider port that Render does not block (2525 if offered) or switch to the provider's web API.
 3. Keep Supabase's database from pausing, and expect about a minute of delay on the first request after the API sleeps.
 
