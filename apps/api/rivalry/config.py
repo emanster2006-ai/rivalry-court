@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     smtp_port: int = 1025
     smtp_user: str = ""
     smtp_password: str = ""
+    # Real providers (Brevo etc.) require an encrypted connection; local Mailpit does not.
+    smtp_starttls: bool = False
     mail_from: str = "Rivalry Court <no-reply@rivalry.local>"
     app_env: str = "development"
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")

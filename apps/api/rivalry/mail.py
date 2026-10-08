@@ -15,6 +15,8 @@ def send_score_notice(addresses: list[str], duel_id: str) -> None:
             f"{settings.web_url}/?duel={duel_id}\n"
         )
         with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=10) as client:
+            if settings.smtp_starttls:
+                client.starttls()
             if settings.smtp_user:
                 client.login(settings.smtp_user, settings.smtp_password)
             client.send_message(msg)

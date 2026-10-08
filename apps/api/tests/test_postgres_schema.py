@@ -18,3 +18,14 @@ def test_immutable_tables_and_probability_constraint() -> None:
         "submissions", "score_revisions", "score_notices", "confirmations", "void_events"
     )} <= triggers
     assert {"probability_step", "nonnegative_scores", "different_members", "claim_type"} <= constraints
+
+
+@pytest.mark.skipif(not os.getenv("TEST_DATABASE_URL"), reason="Requires a migrated PostgreSQL test database")
+def test_every_public_table_has_row_level_security() -> None:
+    engine = create_engine(os.environ["TEST_DATABASE_URL"])
+    with engine.connect() as connection:
+        unprotected = connection.execute(text("""
+            SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE n.nspname = 'public' AND c.relkind = 'r' AND NOT c.relrowsecurity
+        """)).scalars().all()
+    assert unprotected == []
