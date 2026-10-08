@@ -36,6 +36,11 @@ Last updated: 2026-10-08. Tests: API 15 passing, web 10 passing.
 - [x] Production config guard: app refuses to start with APP_ENV=production and a placeholder JWT secret/DB password or non-https WEB_URL (tests added)
 - [x] Deploy prep: production web image (`apps/web/Dockerfile.prod` + nginx, built and served locally OK) and `DEPLOY.md` checklist. Nothing deployed yet
 
+## FPL data source (researched October 2026)
+- The FPL web API (`fantasy.premierleague.com/api`) is undocumented and unofficial, so it can change without notice.
+- premierleague.com's terms restrict reusing site material, building databases from downloaded material, and commercial use. They do not mention APIs or scraping by name and do not address FPL data separately.
+- Decision: keep manual score entry with a link to the FPL source. Do not build automatic import until permission is confirmed with the Premier League.
+
 ## Later (per README)
 - Fork the gameweek (captain swap first, then transfers)
 - AI opposing counsel (confidence before/after)
