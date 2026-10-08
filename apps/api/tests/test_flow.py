@@ -59,6 +59,22 @@ def setup_duel(flow):
     return group, duel, deadline
 
 
+def test_usernames_are_unique_and_hide_group_emails(flow):
+    client, ids, _, _ = flow
+    group, _, _ = setup_duel(flow)
+    assert call(client, 0, "PATCH", "/me", {"username": "Captain_E"}).json()["username"] == "captain_e"
+    assert call(client, 1, "PATCH", "/me", {"username": "CAPTAIN_E"}).status_code == 409
+    assert call(client, 1, "PATCH", "/me", {"username": "bad name"}).status_code == 422
+    assert call(client, 1, "PATCH", "/me", {"username": "Rival_1"}).status_code == 200
+    members = call(client, 1, "GET", f"/groups/{group['id']}/members").json()
+    assert {member["display_name"] for member in members} == {"captain_e", "rival_1"}
+    assert all("email" not in member for member in members)
+    history = call(client, 1, "GET", f"/groups/{group['id']}/history").json()
+    assert history[str(ids[0])]["display_name"] == "captain_e"
+    assert "email" not in history[str(ids[0])]
+    assert call(client, 0, "GET", "/me").json()["email"] == "person0@example.com"
+
+
 def test_admin_can_replace_a_lost_invite_code(flow):
     client, _, _, _ = flow
     group = call(client, 0, "POST", "/groups", {"name": "Friends"}).json()

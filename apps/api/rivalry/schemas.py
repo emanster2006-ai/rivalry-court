@@ -9,6 +9,15 @@ class CreateGroup(BaseModel):
     name: str = Field(min_length=2, max_length=80)
 
 
+class UpdateUsername(BaseModel):
+    username: str = Field(min_length=3, max_length=24, pattern=r"^[A-Za-z0-9_]+$")
+
+    @field_validator("username")
+    @classmethod
+    def lowercase_username(cls, value: str) -> str:
+        return value.lower()
+
+
 class JoinGroup(BaseModel):
     invite_code: str = Field(min_length=8, max_length=100)
 

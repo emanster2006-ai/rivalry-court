@@ -6,6 +6,7 @@ from datetime import UTC
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from rivalry.auth import current_user, membership
@@ -31,6 +32,7 @@ from rivalry.schemas import (
     EnterScore,
     JoinGroup,
     SubmitProbability,
+    UpdateUsername,
     VoidDuel,
 )
 
@@ -46,7 +48,26 @@ def health() -> dict[str, str]:
 
 @app.get("/me")
 def me(user: User = Depends(current_user)) -> dict:
-    return {"id": str(user.id), "email": user.email}
+    return {"id": str(user.id), "email": user.email, "username": user.username,
+            "display_name": display_name(user)}
+
+
+def display_name(user: User) -> str:
+    return user.username or f"Player-{str(user.id)[:8]}"
+
+
+@app.patch("/me")
+def update_me(body: UpdateUsername, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    profile = db.get(User, user.id)
+    if profile is None:
+        raise HTTPException(404, "Profile not found")
+    profile.username = body.username
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(409, "Username is already taken") from exc
+    return me(profile)
 
 
 def invite_hash(code: str) -> str:
@@ -108,8 +129,9 @@ def rotate_invite_code(
 def list_members(group_id: uuid.UUID, user: User = Depends(current_user), db: Session = Depends(get_db)) -> list[dict]:
     membership(db, group_id, user.id)
     rows = db.execute(select(User, Membership.role).join(Membership, Membership.user_id == User.id)
-                      .where(Membership.group_id == group_id).order_by(User.email)).all()
-    return [{"id": str(member.id), "email": member.email, "role": role} for member, role in rows]
+                      .where(Membership.group_id == group_id).order_by(User.username, User.id)).all()
+    return [{"id": str(member.id), "username": member.username,
+             "display_name": display_name(member), "role": role} for member, role in rows]
 
 
 def get_duel(db: Session, duel_id: uuid.UUID, user_id: uuid.UUID, lock: bool = False) -> Duel:
@@ -304,7 +326,7 @@ def history(group_id: uuid.UUID, user: User = Depends(current_user), db: Session
     membership(db, group_id, user.id)
     members = list_members(group_id, user, db)
     duels = db.scalars(select(Duel).where(Duel.group_id == group_id)).all()
-    records = {m["id"]: {"email": m["email"], "sample_size": 0,
+    records = {m["id"]: {"display_name": m["display_name"], "sample_size": 0,
                            "mean_brier": None, "wins": 0, "losses": 0, "history": []} for m in members}
     totals = {member_id: 0.0 for member_id in records}
     for duel in duels:

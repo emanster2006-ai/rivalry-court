@@ -5,6 +5,7 @@ from sqlalchemy import (
     CheckConstraint,
     DateTime,
     ForeignKey,
+    Index,
     Integer,
     String,
     UniqueConstraint,
@@ -22,8 +23,10 @@ def uuid_col() -> Mapped[uuid.UUID]:
 
 class User(Base):
     __tablename__ = "users"
+    __table_args__ = (Index("ix_users_username", "username", unique=True),)
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
     email: Mapped[str] = mapped_column(String(320), unique=True)
+    username: Mapped[str | None] = mapped_column(String(24), nullable=True)
 
 
 class Group(Base):
