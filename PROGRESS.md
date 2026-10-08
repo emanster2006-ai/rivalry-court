@@ -34,7 +34,7 @@ Last updated: 2026-10-08. Tests: API 15 passing, web 10 passing.
 - [x] Test gaps closed: deadline boundary (1s before / at deadline), outsiders and non-participants, void duel, repeat-dispute guard, exact 72h boundary (API: 12 tests)
 - [x] CI workflow written (`.github/workflows/ci.yml`: API ruff+pytest, web tsc+lint+test+build). API steps verified in a clean venv; not yet run on GitHub (repo not pushed)
 - [x] Production config guard: app refuses to start with APP_ENV=production and a placeholder JWT secret/DB password or non-https WEB_URL (tests added)
-- [ ] Deploy plan
+- [x] Deploy prep: production web image (`apps/web/Dockerfile.prod` + nginx, built and served locally OK) and `DEPLOY.md` checklist. Nothing deployed yet
 
 ## Later (per README)
 - Fork the gameweek (captain swap first, then transfers)

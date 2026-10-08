@@ -30,3 +30,14 @@ The first release uses manually entered results. Automatic FPL data import is a 
 - **Tests and delivery:** Unit tests for rules and access control, API tests for the core flow, CI, and a one-command local development setup.
 
 We will ship the first playable flow before adding FPL counterfactual rules or AI. A salted commit-reveal protocol is not planned: private access control and append-only records are enough for the first friend group. Each later phase should be usable with a real group and measured against actual gameweeks.
+
+## Running locally
+
+```sh
+make setup      # creates .env with random local secrets, starts everything with Docker Compose
+make test       # API (pytest) and web (vitest) tests
+```
+
+- Web app: http://localhost:5173 · API: http://localhost:8001 · Sign-in emails (Mailpit): http://localhost:8025
+- If your Docker has no `docker compose` plugin, use `docker-compose`.
+- For the current build status and next steps see `PROGRESS.md`; for going live see `DEPLOY.md`.
