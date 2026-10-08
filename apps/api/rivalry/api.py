@@ -90,6 +90,20 @@ def join_group(body: JoinGroup, user: User = Depends(current_user), db: Session 
     return group_data(group, existing.role if existing else "member")
 
 
+@app.post("/groups/{group_id}/invite-code")
+def rotate_invite_code(
+    group_id: uuid.UUID, user: User = Depends(current_user), db: Session = Depends(get_db)
+) -> dict:
+    membership(db, group_id, user.id, admin=True)
+    group = db.scalar(select(Group).where(Group.id == group_id).with_for_update())
+    if group is None:
+        raise HTTPException(404, "Group not found")
+    code = secrets.token_urlsafe(12).upper()
+    group.invite_hash = invite_hash(code)
+    db.commit()
+    return group_data(group, "admin", code)
+
+
 @app.get("/groups/{group_id}/members")
 def list_members(group_id: uuid.UUID, user: User = Depends(current_user), db: Session = Depends(get_db)) -> list[dict]:
     membership(db, group_id, user.id)

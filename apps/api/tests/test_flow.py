@@ -59,6 +59,19 @@ def setup_duel(flow):
     return group, duel, deadline
 
 
+def test_admin_can_replace_a_lost_invite_code(flow):
+    client, _, _, _ = flow
+    group = call(client, 0, "POST", "/groups", {"name": "Friends"}).json()
+    path = f"/groups/{group['id']}/invite-code"
+    assert call(client, 2, "POST", path).status_code == 404
+    assert call(client, 1, "POST", "/groups/join", {"invite_code": group["invite_code"]}).status_code == 200
+    assert call(client, 1, "POST", path).status_code == 403
+    fresh = call(client, 0, "POST", path).json()["invite_code"]
+    assert fresh != group["invite_code"]
+    assert call(client, 2, "POST", "/groups/join", {"invite_code": group["invite_code"]}).status_code == 404
+    assert call(client, 2, "POST", "/groups/join", {"invite_code": fresh}).status_code == 200
+
+
 def test_private_access_deadline_revisions_and_no_show(flow):
     client, ids, clock, factory = flow
     group, duel, deadline = setup_duel(flow)

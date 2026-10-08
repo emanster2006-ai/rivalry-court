@@ -61,3 +61,20 @@ test('a signed-in member can retry after a temporary API failure', async () => {
   await waitFor(() => expect(screen.queryByRole('alert')).toBeNull())
   expect(screen.getByText('a@example.com')).toBeTruthy()
 })
+
+test('an admin can replace a lost invite code', async () => {
+  vi.mocked(auth.getSession).mockResolvedValue({ data: { session: { access_token: 'test' } }, error: null } as never)
+  vi.mocked(api).mockImplementation(async (path: string, method?: string) => {
+    if (path === '/me') return { id: 'a', email: 'a@example.com' }
+    if (path === '/groups') return [{ id: 'group', name: 'Friends', role: 'admin' }]
+    if (path.endsWith('/members')) return [{ id: 'a', email: 'a@example.com', role: 'admin' }]
+    if (path.endsWith('/duels')) return []
+    if (path.endsWith('/history')) return {}
+    if (path === '/groups/group/invite-code' && method === 'POST') return { id: 'group', name: 'Friends', role: 'admin', invite_code: 'NEW-CODE' }
+    return {}
+  })
+  render(<App />)
+  fireEvent.click(await screen.findByText('Generate new invite code'))
+  await waitFor(() => expect(screen.getByText('NEW-CODE')).toBeTruthy())
+  expect(api).toHaveBeenCalledWith('/groups/group/invite-code', 'POST')
+})

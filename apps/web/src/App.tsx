@@ -16,7 +16,7 @@ export default function App() {
   const [members, setMembers] = useState<Person[]>([])
   const [duels, setDuels] = useState<Duel[]>([])
   const [history, setHistory] = useState<Record<string, MemberHistory>>({})
-  const [newCode, setNewCode] = useState('')
+  const [newCode, setNewCode] = useState<{ groupId: string; code: string } | null>(null)
   const [groupName, setGroupName] = useState('')
   const [inviteCode, setInviteCode] = useState('')
   const [error, setError] = useState('')
@@ -76,11 +76,15 @@ export default function App() {
       <div className="group-controls"><label>Group<select value={selected} onChange={event => { setSelected(event.target.value); refresh(event.target.value).catch(err => setError(String(err))) }}>
         {groups.length === 0 && <option value="">No group yet</option>}
         {groups.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-        <form onSubmit={event => { event.preventDefault(); run(async () => { const made = await api<Group>('/groups', 'POST', { name: groupName }); setNewCode(made.invite_code || ''); setGroupName(''); return made }) }}>
+        <form onSubmit={event => { event.preventDefault(); run(async () => { const made = await api<Group>('/groups', 'POST', { name: groupName }); setNewCode({ groupId: made.id, code: made.invite_code || '' }); setGroupName(''); return made }) }}>
           <label>Create a group<input value={groupName} onChange={event => setGroupName(event.target.value)} placeholder="Weekend rivals" required minLength={2} /></label><button disabled={busy}>Create</button></form>
         <form onSubmit={event => { event.preventDefault(); run(async () => { const joined = await api<Group>('/groups/join', 'POST', { invite_code: inviteCode }); setInviteCode(''); return joined }) }}>
           <label>Join by invite code<input value={inviteCode} onChange={event => setInviteCode(event.target.value)} placeholder="Paste invite code" required /></label><button disabled={busy}>Join</button></form>
-      </div>{newCode && <p className="success">Share this invite code with friends: <strong>{newCode}</strong> (shown once)</p>}</section>
+        {group?.role === 'admin' && <div className="invite-actions"><button className="secondary" disabled={busy} onClick={() => run(async () => {
+          const rotated = await api<Group>(`/groups/${group.id}/invite-code`, 'POST')
+          setNewCode({ groupId: group.id, code: rotated.invite_code || '' })
+        }, group.id)}>Generate new invite code</button><small>This replaces the previous code.</small></div>}
+      </div>{newCode?.groupId === selected && <p className="success">Share this invite code with friends: <strong>{newCode.code}</strong> (shown once)</p>}</section>
 
     {group && <>
       <section className="section-heading"><div><p className="eyebrow">{group.name.toUpperCase()}</p><h2>Duels</h2></div><button className="secondary" onClick={() => refresh().catch(err => setError(String(err)))}>Refresh</button></section>
