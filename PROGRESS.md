@@ -16,16 +16,15 @@ Last updated: 2026-10-08. Tests: API 7 passing, web 2 passing.
 - [x] Group history: wins, losses, sample size, mean Brier
 - [x] Tests: rules, private access, deadline revisions, no-show, dispute/correction, auto-confirm, tie
 
-## Frontend (basic)
-- [x] `App`, `DuelCard`, API client, 2 tests
-- [ ] Sign-in flow (magic link) in the UI
-- [ ] Create/join group screens
-- [ ] Create duel, submit probability, enter/confirm/dispute scores
-- [ ] History and Brier view
-- [ ] Mobile-first polish
+## Frontend
+- [x] Magic-link sign-in (GoTrue + Mailpit) — verified end to end 2026-10-08: link email, verify, `/me` and group create work with the token; no token gives 401
+- [x] Create/join group, group switcher, invite code shown once
+- [x] Create duel (admin), duel cards, history and Brier stats (`App.tsx`, `DuelCard.tsx`)
+- [x] Build, typecheck, lint and tests pass; login page renders at http://localhost:5173
+- [ ] Click through the signed-in screens in a browser (probabilities, scores, confirm/dispute) with two users
+- [ ] Mobile-first polish and empty/error states
 
 ## To verify / open items
-- [ ] Magic-link sign-in: backend only validates a JWT from an external auth service (`scripts/init-auth-db.sql`); confirm that service is wired up in compose and works end to end
 - [ ] Captain-duel scoring: `rules.captain_slot_points` exists; confirm it is used for captain duels, with tests for vice promotion, chips, and empty slots
 - [ ] Test gaps vs README list: exact deadline boundaries over HTTP, late submissions, correction notice windows
 - [ ] CI (not set up)
