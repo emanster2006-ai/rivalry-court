@@ -5,7 +5,12 @@ from rivalry.config import Settings
 
 
 def make(**overrides) -> Settings:
-    return Settings(_env_file=None, **overrides)
+    defaults = {
+        "database_url": "postgresql+psycopg://rivalry:change-me@localhost:5432/rivalry_court",
+        "auth_jwt_secret": "replace-with-a-long-random-secret",
+        "web_url": "http://localhost:5173",
+    }
+    return Settings(_env_file=None, **(defaults | overrides))
 
 
 def test_development_allows_placeholder_values() -> None:
