@@ -5,8 +5,8 @@ import { DuelCard } from './DuelCard'
 
 afterEach(cleanup)
 
-const a: Person = { id: 'a', email: 'a@example.com', role: 'member' }
-const b: Person = { id: 'b', email: 'b@example.com', role: 'member' }
+const a: Person = { id: 'a', username: 'captain_e', display_name: 'captain_e', role: 'member' }
+const b: Person = { id: 'b', username: 'rival_1', display_name: 'rival_1', role: 'member' }
 const members = [a, b]
 
 function duel(overrides: Partial<Duel>): Duel {
@@ -29,16 +29,16 @@ function renderCard(d: Duel, me: Person, admin: boolean) {
 
 test('after the deadline both probabilities are shown and nobody can revise', () => {
   renderCard(duel({}), a, false)
-  expect(screen.getByText(/a@example.com: 60%/)).toBeTruthy()
-  expect(screen.getByText(/b@example.com: 45%/)).toBeTruthy()
+  expect(screen.getByText(/captain_e: 60%/)).toBeTruthy()
+  expect(screen.getByText(/rival_1: 45%/)).toBeTruthy()
   expect(screen.queryByText('Lock / revise')).toBeNull()
 })
 
 test('only an admin sees score entry, and it posts both values with the source', () => {
   const act = renderCard(duel({}), a, true)
   fireEvent.click(screen.getByText('Enter final score'))
-  fireEvent.change(screen.getByLabelText('a@example.com points'), { target: { value: '70' } })
-  fireEvent.change(screen.getByLabelText('b@example.com points'), { target: { value: '62' } })
+  fireEvent.change(screen.getByLabelText('captain_e points'), { target: { value: '70' } })
+  fireEvent.change(screen.getByLabelText('rival_1 points'), { target: { value: '62' } })
   fireEvent.change(screen.getByLabelText('Official FPL source URL'), { target: { value: 'https://fantasy.premierleague.com/x' } })
   fireEvent.click(screen.getByText(/Post score/))
   expect(act).toHaveBeenCalledWith('/duels/duel/scores', { score_a: 70, score_b: 62, source_url: 'https://fantasy.premierleague.com/x' })

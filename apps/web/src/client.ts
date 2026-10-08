@@ -19,7 +19,7 @@ export async function api<T>(path: string, method = 'GET', body?: unknown): Prom
   return response.json() as Promise<T>
 }
 
-export interface Person { id: string; email: string; role: string }
+export interface Person { id: string; username: string | null; display_name: string; role?: string; email?: string }
 export interface Group { id: string; name: string; role: string; invite_code?: string }
 export interface ScoreResponse { user_id: string; action: 'confirm' | 'dispute'; reason: string | null; created_at: string }
 export interface ScoreRevision { id: string; score_a: number; score_b: number; source_url: string; created_at: string; entered_by: string; responses: ScoreResponse[] }
@@ -29,4 +29,4 @@ export interface Duel {
   probabilities: Record<string, number>; scores: ScoreRevision[]; void_reason: string | null
 }
 export interface HistoryEntry { duel_id: string; gameweek: string; claim_type: string; status: string; void_reason: string | null; probability_pct?: number; won?: boolean; brier?: number }
-export interface MemberHistory { email: string; sample_size: number; mean_brier: number | null; wins: number; losses: number; history: HistoryEntry[] }
+export interface MemberHistory { display_name: string; sample_size: number; mean_brier: number | null; wins: number; losses: number; history: HistoryEntry[] }

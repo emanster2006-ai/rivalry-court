@@ -15,8 +15,8 @@ export function CreateDuelForm({ members, busy, onCreate }: { members: Person[];
   }, [members])
   return <form className="panel create-duel" onSubmit={event => { event.preventDefault(); onCreate({ member_a_id: a, member_b_id: b, claim_type: type, gameweek, deadline_at: new Date(deadline).toISOString() }) }}>
     <div><p className="eyebrow">ADMIN</p><h3>New duel</h3><p>Enter the official FPL deadline in your local time. It locks once a prediction is submitted.</p></div>
-    <div className="form-grid"><label>Side A<select value={a} onChange={event => setA(event.target.value)} required>{members.map(m => <option value={m.id} key={m.id}>{m.email}</option>)}</select></label>
-      <label>Side B<select value={b} onChange={event => setB(event.target.value)} required>{members.map(m => <option value={m.id} key={m.id}>{m.email}</option>)}</select></label>
+    <div className="form-grid"><label>Side A<select value={a} onChange={event => setA(event.target.value)} required>{members.map(m => <option value={m.id} key={m.id}>{m.display_name}</option>)}</select></label>
+      <label>Side B<select value={b} onChange={event => setB(event.target.value)} required>{members.map(m => <option value={m.id} key={m.id}>{m.display_name}</option>)}</select></label>
       <label>Claim<select value={type} onChange={event => setType(event.target.value)}><option value="gameweek_points">Gameweek points</option><option value="captain_points">Captain slot points</option></select></label>
       <label>Gameweek<input value={gameweek} onChange={event => setGameweek(event.target.value)} placeholder="2026/27 GW8" required /></label>
       <label>FPL deadline<input type="datetime-local" value={deadline} onChange={event => setDeadline(event.target.value)} required /></label>
@@ -30,8 +30,8 @@ export function DuelCard({ duel, me, members, admin, busy, act }: { duel: Duel; 
   useEffect(() => setProbability(savedProbability ?? 50), [me.id, savedProbability])
   const [scoreA, setScoreA] = useState(''); const [scoreB, setScoreB] = useState(''); const [source, setSource] = useState('')
   const [reason, setReason] = useState(''); const [voidReason, setVoidReason] = useState('')
-  const a = members.find(m => m.id === duel.member_a_id)?.email || 'Side A'
-  const b = members.find(m => m.id === duel.member_b_id)?.email || 'Side B'
+  const a = members.find(m => m.id === duel.member_a_id)?.display_name || 'Side A'
+  const b = members.find(m => m.id === duel.member_b_id)?.display_name || 'Side B'
   const latest = duel.scores.at(-1)
   const participant = [duel.member_a_id, duel.member_b_id].includes(me.id)
   const responded = latest?.responses.some(response => response.user_id === me.id)
@@ -48,7 +48,7 @@ export function DuelCard({ duel, me, members, admin, busy, act }: { duel: Duel; 
     {duel.void_reason && <p className="muted">{duel.void_reason}</p>}
     {duel.scores.length > 0 && <details open={duel.status === 'disputed'}><summary>Score record ({duel.scores.length})</summary><ol>{duel.scores.map((revision, index) => <li key={revision.id}>
       <strong>Entry {index + 1}: {revision.score_a}–{revision.score_b}</strong> · <a href={revision.source_url} target="_blank" rel="noreferrer">FPL source</a> · {date(revision.created_at)}
-      {revision.responses.map(response => <p key={response.user_id} className="muted">{members.find(m => m.id === response.user_id)?.email}: {response.action}{response.reason ? ` — ${response.reason}` : ''}</p>)}
+      {revision.responses.map(response => <p key={response.user_id} className="muted">{members.find(m => m.id === response.user_id)?.display_name}: {response.action}{response.reason ? ` — ${response.reason}` : ''}</p>)}
     </li>)}</ol></details>}
     {canRespond && <div className="review"><button disabled={busy} onClick={() => act(`/duels/${duel.id}/scores/${latest.id}/confirm`)}>Confirm score</button>
       <form onSubmit={event => submit(event, `/duels/${duel.id}/scores/${latest.id}/dispute`, { reason })}><label>Dispute with reason<input minLength={10} maxLength={1000} value={reason} onChange={event => setReason(event.target.value)} placeholder="Explain what is wrong" required /></label><button className="secondary" disabled={busy}>Dispute</button></form></div>}

@@ -11,7 +11,7 @@ Rivalry Court is a social game played alongside Fantasy Premier League (FPL). Fr
 
 ## First release: definition of done
 
-- Members sign in by email magic link and join a private group by invite code.
+- Members sign in by email magic link, choose a unique username for public display, and join a private group by invite code.
 - A group admin creates a duel for two members using one of the two fixed claim types and enters the official FPL gameweek deadline before submissions open. The server enforces it in UTC and rejects late submissions. An incorrect deadline voids the duel rather than being moved after a submission.
 - Each member submits only a 0–100% probability, in 5-point steps, that their own side wins. Revisions before the deadline are preserved; only the latest counts. Probabilities stay hidden until the deadline and are locked afterward.
 - A missing submission or tied result voids the duel. Voided duels remain in activity history but do not affect wins, losses, or Brier scores.
@@ -34,6 +34,8 @@ We will ship the first playable flow before adding FPL counterfactual rules or A
 ## Run locally
 
 Install Docker and Docker Compose, then run `make setup` from this directory. It creates `.env` with random local secrets and starts PostgreSQL, GoTrue, Mailpit, the API, and the web app. Open [Rivalry Court](http://localhost:5173) and use [Mailpit](http://localhost:8025) to open your magic link. The API is at [localhost:8001](http://localhost:8001/docs). After setup, `docker compose up --build` restarts the stack; `docker-compose up --build` also works when Compose is installed as a standalone command. Run `make test` for API and web tests. No external FPL or AI key is needed for this release. See [PROGRESS.md](PROGRESS.md) for verification notes and [DEPLOY.md](DEPLOY.md) for deployment considerations.
+
+After signing in, choose a username in **Your name in court**. Usernames are unique, use 3–24 letters, numbers, or underscores, and appear on duels and group history. Until set, a member appears as a temporary `Player-xxxxxxxx` label. Other group members do not receive your email address from the group API. Local sign-in links and score notices go to Mailpit because `.env` points SMTP to the local test inbox. To deliver to Gmail or another real inbox, deploy the app with a real SMTP provider and verified sender; changing the email typed into the login form does not change local delivery.
 
 For a local two-person trial, sign in as the second member in an incognito window on the same computer and use the invite code. `localhost` is not reachable from a friend's computer; hosting is needed for remote friends.
 
