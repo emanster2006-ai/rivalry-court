@@ -1,5 +1,27 @@
 # Deploying Rivalry Court
 
+## Free-hosting research (October 2026)
+Checked against the providers' own pages where possible; blog comparisons disagreed with each other, so re-check pricing pages before signing up.
+
+| Option | What it gives | Problems |
+|---|---|---|
+| Render free web service | 750 instance hours/month, 1 instance, sleeps after 15 idle minutes (about 1 minute to wake) | **Outbound SMTP ports 25, 465, 587 are blocked**, so the API cannot send score emails on them; files vanish on restart |
+| Render free Postgres | 1 GB | **Expires after 30 days, deleted after a 14-day grace period.** Not usable for real history |
+| Supabase Free | Auth + Postgres, 500 MB, 50,000 monthly users, two free projects | Built-in email sender only allows 2 messages/hour and only to team members, so custom SMTP is required; inactivity pausing is not stated on the pages I read (check) |
+| Brevo free SMTP | About 300 emails/day (from search results; the official page could not be read) | Needs an account; confirm which SMTP ports it supports |
+| Oracle Cloud always-free VM | Runs the whole Docker Compose stack as-is | Needs a card for sign-up; you manage the server and its security |
+
+**Best fit for "free and safe" at friend-group scale (not yet built or tested):**
+Supabase Free (sign-in + database) + Render free web service (API) + a free static host for the web app + Brevo free SMTP for emails.
+Open items before this works:
+1. The API verifies sign-in tokens with a shared HS256 secret. Check which signing method the hosted Supabase project uses and adapt `rivalry/auth.py` if it uses public keys instead.
+2. The API sends score notices over SMTP from Render. Use a provider port that Render does not block (2525 if offered) or switch to the provider's web API.
+3. Keep Supabase's database from pausing, and expect about a minute of delay on the first request after the API sleeps.
+
+**Not recommended:** hosting everything on Render's free tier (the database disappears), or Fly.io (no real free tier now).
+
+**Accounts:** signing up for these services has to be done by you; I cannot create accounts.
+
 Nothing here has been run against a real host yet. It is a checklist for the first deployment.
 
 ## What has to run
