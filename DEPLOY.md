@@ -37,7 +37,8 @@ Nothing here has been run against a real host yet. It is a checklist for the fir
 - `AUTH_JWT_SECRET` — random, 32+ characters, **identical** for GoTrue (`GOTRUE_JWT_SECRET`) and the API.
 - `DATABASE_URL`, `POSTGRES_*` — real passwords, never the `change-me` defaults.
 - `WEB_URL` — the public https address of the web app. Used for CORS and magic-link redirects (`GOTRUE_SITE_URL`, `GOTRUE_URI_ALLOW_LIST`).
-- `AUTH_URL` / `API_URL` — public https addresses the browser calls.
+- `AUTH_URL` / `API_URL` — public https addresses the browser calls. For hosted Supabase, `AUTH_URL` is `https://<project-ref>.supabase.co/auth/v1` and the web build also needs `VITE_AUTH_ANON_KEY` (the project's publishable key, which is safe to expose in the browser).
+- `AUTH_JWKS_URL` — for hosted Supabase, `https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json`.
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `MAIL_FROM` — a real mail provider. Used by GoTrue (magic links) and the API (score notices). Mailpit is local only.
 - Set `GOTRUE_MAILER_AUTOCONFIRM=false` and consider `GOTRUE_DISABLE_SIGNUP=true` after friends have joined.
 
