@@ -33,7 +33,7 @@ Mailpit catches local outgoing mail because `.env` sets `SMTP_HOST=mailpit`; typ
 
 - The username flow has API and web tests, and the updated containers were started; a fresh manual click-through of setting names in both browser sessions was not done. Refresh the app, set a username in each account, and check the `who vs who` display if the user wants a UI check.
 - Void, tie, and 72-hour auto-confirmation have automated coverage but have not been clicked through in the browser. A real-phone visual review is still open.
-- CI exists but has not run on GitHub because the repo has not been pushed. Nothing is deployed. The user asked whether friends need to be on their laptop: for now, yes, because all URLs are localhost. Deployment is the separate next step; see `DEPLOY.md`.
+- The repo is pushed (private, emanster2006-ai/rivalry-court) and CI passed on GitHub. Nothing is deployed. The user asked whether friends need to be on their laptop: for now, yes, because all URLs are localhost. Deployment is the separate next step; see `DEPLOY.md`.
 - FPL score and deadline entry remain manual. AI opposing counsel and gameweek forks are roadmap items, not part of this release. Do not silently expand scope or scrape/import FPL data; `README.md` and `PROGRESS.md` record the data-source decision.
 
 The user is a third-year software-engineering student building this with an assistant for internship portfolio value and enjoyment. They prefer the assistant to implement changes rather than asking them to type code. Explain product behavior plainly, and distinguish what was verified from what is only planned.
