@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-10-08. Tests: API 12 passing, web 3 passing.
+Last updated: 2026-10-08. Tests: API 15 passing, web 3 passing.
 
 ## Done (first release backend)
 - [x] Monorepo scaffold, docker compose, setup script, Makefile
@@ -32,7 +32,8 @@ Last updated: 2026-10-08. Tests: API 12 passing, web 3 passing.
 ## To verify / open items
 - [ ] Captain-duel scoring: `rules.captain_slot_points` exists; confirm it is used for captain duels, with tests for vice promotion, chips, and empty slots
 - [x] Test gaps closed: deadline boundary (1s before / at deadline), outsiders and non-participants, void duel, repeat-dispute guard, exact 72h boundary (API: 12 tests)
-- [ ] CI (not set up)
+- [x] CI workflow written (`.github/workflows/ci.yml`: API ruff+pytest, web tsc+lint+test+build). API steps verified in a clean venv; not yet run on GitHub (repo not pushed)
+- [x] Production config guard: app refuses to start with APP_ENV=production and a placeholder JWT secret/DB password or non-https WEB_URL (tests added)
 - [ ] Deploy plan
 
 ## Later (per README)
