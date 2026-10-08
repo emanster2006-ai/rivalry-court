@@ -36,7 +36,7 @@ Last updated: 2026-10-08. Tests: API 19 passing with PostgreSQL (18 passing and 
 ## To verify / open items
 - [x] Captain-duel scoring: the admin enters FPL's official captain-slot points; `rules.captain_slot_points` documents and tests vice promotion, chip multipliers, and empty slots. Automatic FPL scoring is outside this release.
 - [x] Test gaps closed: deadline boundary (1s before / at deadline), outsiders and non-participants, void duel, repeat-dispute guard, exact 72h boundary (API: 12 tests)
-- [x] CI workflow written (`.github/workflows/ci.yml`: API ruff+pytest, web tsc+lint+test+build). API steps verified in a clean venv; not yet run on GitHub (repo not pushed)
+- [x] CI workflow written (`.github/workflows/ci.yml`: API ruff+pytest, web tsc+lint+test+build). **Passed on GitHub 2026-10-08** (both jobs green) at https://github.com/emanster2006-ai/rivalry-court (private)
 - [x] Production config guard: app refuses to start with APP_ENV=production and a placeholder JWT secret/DB password or non-https WEB_URL (tests added)
 - [x] Deploy prep: production web image (`apps/web/Dockerfile.prod` + nginx, built and served locally OK) and `DEPLOY.md` checklist. Nothing deployed yet
 
