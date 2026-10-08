@@ -1,6 +1,11 @@
 import { AuthClient } from '@supabase/auth-js'
 
-export const auth = new AuthClient({ url: import.meta.env.VITE_AUTH_URL || 'http://localhost:9999' })
+// Hosted Supabase needs its public (publishable) key on every auth request; local GoTrue does not.
+const anonKey = import.meta.env.VITE_AUTH_ANON_KEY as string | undefined
+export const auth = new AuthClient({
+  url: import.meta.env.VITE_AUTH_URL || 'http://localhost:9999',
+  headers: anonKey ? { apikey: anonKey } : undefined,
+})
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8001'
 
 export async function api<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
