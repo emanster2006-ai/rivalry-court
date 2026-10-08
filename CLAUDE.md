@@ -2,6 +2,8 @@
 
 Social game played alongside Fantasy Premier League: friends lock sealed win-probabilities for head-to-head duels, then resolve them from FPL scores. See `README.md` for the agreed scope and the first-release definition of done. See `PROGRESS.md` for what is built and what is next — read it first and update it when you finish work.
 
+For the 2026-10-08 takeover snapshot, read `SESSION_HANDOFF.md` after `PROGRESS.md`.
+
 ## Layout
 - `apps/api` — Python / FastAPI / SQLAlchemy / Alembic. Code in `rivalry/` (`api.py` routes, `rules.py` pure rules, `models.py`, `auth.py` JWT bearer, `mail.py` SMTP score notices). Tests in `tests/`.
 - `apps/web` — React + TypeScript + Vite + Vitest (`src/App.tsx`, `DuelCard.tsx`, `client.ts`).
