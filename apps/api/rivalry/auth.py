@@ -1,4 +1,5 @@
 import uuid
+from functools import lru_cache
 
 import jwt
 from fastapi import Depends, HTTPException
@@ -14,16 +15,24 @@ from rivalry.models import User
 bearer = HTTPBearer()
 
 
+@lru_cache
+def jwks_client(url: str) -> jwt.PyJWKClient:
+    return jwt.PyJWKClient(url, cache_keys=True, lifespan=600)
+
+
+def decode_token(token: str) -> dict:
+    """Verify a sign-in token: public-key (JWKS) when configured, else the shared secret."""
+    if settings.auth_jwks_url:
+        key = jwks_client(settings.auth_jwks_url).get_signing_key_from_jwt(token).key
+        return jwt.decode(token, key, algorithms=["ES256", "RS256"], audience="authenticated")
+    return jwt.decode(token, settings.auth_jwt_secret, algorithms=["HS256"], audience="authenticated")
+
+
 def current_user(
     token: HTTPAuthorizationCredentials = Depends(bearer), db: Session = Depends(get_db)
 ) -> User:
     try:
-        claims = jwt.decode(
-            token.credentials,
-            settings.auth_jwt_secret,
-            algorithms=["HS256"],
-            audience="authenticated",
-        )
+        claims = decode_token(token.credentials)
         user_id = uuid.UUID(claims["sub"])
         email = claims["email"].lower()
     except (jwt.PyJWTError, KeyError, ValueError, TypeError) as exc:
