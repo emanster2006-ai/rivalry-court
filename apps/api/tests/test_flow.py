@@ -66,6 +66,10 @@ def test_usernames_are_unique_and_hide_group_emails(flow):
     assert call(client, 1, "PATCH", "/me", {"username": "CAPTAIN_E"}).status_code == 409
     assert call(client, 1, "PATCH", "/me", {"username": "bad name"}).status_code == 422
     assert call(client, 1, "PATCH", "/me", {"username": "Rival_1"}).status_code == 200
+    # A username can only be chosen once, even to the same value.
+    assert call(client, 1, "PATCH", "/me", {"username": "Another_1"}).status_code == 409
+    assert call(client, 1, "PATCH", "/me", {"username": "rival_1"}).status_code == 409
+    assert call(client, 1, "GET", "/me").json()["username"] == "rival_1"
     members = call(client, 1, "GET", f"/groups/{group['id']}/members").json()
     assert {member["display_name"] for member in members} == {"captain_e", "rival_1"}
     assert all("email" not in member for member in members)

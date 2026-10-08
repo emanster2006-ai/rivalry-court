@@ -5,7 +5,7 @@ from datetime import UTC
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -58,15 +58,20 @@ def display_name(user: User) -> str:
 
 @app.patch("/me")
 def update_me(body: UpdateUsername, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    profile = db.get(User, user.id)
-    if profile is None:
-        raise HTTPException(404, "Profile not found")
-    profile.username = body.username
+    # The username can be chosen once. The conditional UPDATE keeps two simultaneous
+    # requests from both succeeding.
     try:
+        changed = db.execute(
+            update(User).where(User.id == user.id, User.username.is_(None)).values(username=body.username)
+        ).rowcount
         db.commit()
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(409, "Username is already taken") from exc
+    if not changed:
+        raise HTTPException(409, "Your username is already set and cannot be changed")
+    profile = db.get(User, user.id)
+    db.refresh(profile)
     return me(profile)
 
 

@@ -73,11 +73,14 @@ export default function App() {
   return <main className="shell">
     <header><div className="brand">RIVALRY <span>COURT</span></div><div className="account"><span>{me?.display_name}</span><button className="text-button" onClick={() => auth.signOut()}>Sign out</button></div></header>
     {error && <div className="error" role="alert">{error} <button className="secondary" onClick={() => refresh().catch(err => setError(String(err)))}>Try again</button></div>}
-    <section className="panel profile-panel"><div><p className="eyebrow">YOUR NAME IN COURT</p><p>{me?.username ? 'Friends see this username on duels and records.' : 'Pick a username so friends see your name instead of a player number.'}</p></div>
-      <form onSubmit={event => { event.preventDefault(); run(() => api('/me', 'PATCH', { username })) }}>
+    <section className="panel profile-panel"><div><p className="eyebrow">YOUR NAME IN COURT</p>
+      {me?.username
+        ? <p>You play as <strong>{me.username}</strong>. Friends see this on duels and records. It can't be changed.</p>
+        : <p>Pick a username so friends see your name instead of a player number. <strong>You can only choose it once.</strong></p>}</div>
+      {!me?.username && <form onSubmit={event => { event.preventDefault(); run(() => api('/me', 'PATCH', { username })) }}>
         <label>Username<input value={username} onChange={event => setUsername(event.target.value)} minLength={3} maxLength={24} pattern="[A-Za-z0-9_]+" autoComplete="nickname" placeholder="your_name" required /></label>
-        <button disabled={busy || username.toLowerCase() === me?.username}>Save</button>
-      </form></section>
+        <button disabled={busy}>Save permanently</button>
+      </form>}</section>
     <section className="panel group-panel"><div><p className="eyebrow">YOUR COURT</p><h1>Make the call before kickoff.</h1></div>
       <div className="group-controls"><label>Group<select value={selected} onChange={event => { setSelected(event.target.value); refresh(event.target.value).catch(err => setError(String(err))) }}>
         {groups.length === 0 && <option value="">No group yet</option>}

@@ -95,7 +95,10 @@ test('a member can save a username for the duel display', async () => {
   render(<App />)
   await screen.findByText('Player-12345678')
   fireEvent.change(screen.getByLabelText('Username'), { target: { value: 'Captain_E' } })
-  fireEvent.click(screen.getByText('Save'))
+  fireEvent.click(screen.getByText('Save permanently'))
   await waitFor(() => expect(api).toHaveBeenCalledWith('/me', 'PATCH', { username: 'Captain_E' }))
-  await screen.findByText('captain_e')
+  await screen.findByText(/It can't be changed/)
+  // Once chosen, the form is gone, so the name cannot be edited.
+  expect(screen.queryByLabelText('Username')).toBeNull()
+  expect(screen.queryByText('Save permanently')).toBeNull()
 })
