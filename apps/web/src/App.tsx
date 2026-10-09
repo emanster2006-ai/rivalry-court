@@ -67,7 +67,8 @@ export default function App() {
       <p>Lock a prediction against a friend before the deadline. Revisit it when the scores are final.</p>
       <form onSubmit={signIn}><label>Email address<input type="email" value={email} onChange={event => setEmail(event.target.value)} required placeholder="you@example.com" /></label>
         <button type="submit">Send sign-in link</button></form>
-      {sent && <p className="success">Check your email. In local development, open Mailpit at <a href="http://localhost:8025" target="_blank">localhost:8025</a>.</p>}
+      {sent && <p className="success">Check your email for the sign-in link (look in spam too).
+        {import.meta.env.DEV && <> In local development, open Mailpit at <a href="http://localhost:8025" target="_blank">localhost:8025</a>.</>}</p>}
       {error && <p className="error" role="alert">{error}</p>}</section></main>
 
   return <main className="shell">
