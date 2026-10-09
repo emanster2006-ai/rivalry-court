@@ -62,5 +62,6 @@ Last updated: 2026-10-08. Tests: API 19 passing with PostgreSQL (18 passing and 
 - API: https://rivalry-court-api.onrender.com (Render Docker, free; sleeps after 15 idle minutes, ~50s to wake)
 - Database + sign-in: Supabase project `gfgbawwuwacaduneaxaa` (free); email via Brevo SMTP
 - Verified from outside: API health 200, no-token and forged-token requests get 401, CORS allows only the web origin, website bundle points at the right API/Supabase/key. API reached Live only after migrations (incl. row-level security) ran on Supabase.
-- Not yet verified: a real magic-link sign-in on the live site (needs the Supabase Site URL set to the web address and Brevo delivery working); the first duel on production.
+- Verified 2026-10-08/09: real magic-link sign-in on the live site via Brevo (first email landed in spam), a friend joined by invite code, a duel was created and predictions locked.
+- Not yet verified on production: the score-notice email sent by the API (Render → Brevo port 2525 + STARTTLS), dispute/correction/void/tie/72-hour flows, a real phone. A one-off `Database error saving new user` appeared once at sign-in (account still created); check Supabase Auth logs.
 - Render fix history: `dockerCommand: sh -c "..."` failed with exit 127; replaced by `apps/api/start.sh`.
