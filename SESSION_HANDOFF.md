@@ -1,5 +1,15 @@
 # Rivalry Court handoff — 2026-10-08
 
+> **Update 2026-10-09 (after the 2026-10-08 snapshot below): the app is deployed and in use.** Start with `AGENTS.md` for the full current picture. Summary of what changed since the snapshot:
+>
+> - **Deployed free:** web on Render (static), API on Render (Docker), sign-in + Postgres on Supabase, email via Brevo. URLs and caveats are in `AGENTS.md` and `DEPLOY.md`; `render.yaml` is the Render Blueprint.
+> - **Code changes for production:** API verifies Supabase public-key (ES256/JWKS) tokens; mailer supports STARTTLS; migration `0003` enables row-level security on all tables; `apps/api/start.sh` runs migrations then serves; production config guard rejects placeholder secrets; web sends the Supabase publishable key; usernames are now permanent (set once); Mailpit hint hidden in production; error boundary; more tests (API 25, web 14); CI runs against Postgres and is green on GitHub.
+> - **GitHub:** private repo `emanster2006-ai/rivalry-court`, branch `main`.
+> - **Verified live:** real magic-link sign-in through Brevo (lands in spam first time), join by invite code, duel creation, prediction locking with two real people.
+> - **Still unverified live:** score-notice email from the API, dispute/void/tie/72-hour flows, real phone. Details and next steps: `AGENTS.md` → "Open items".
+> - Previous assistant: Claude Code; this file was originally written by a Codex session. The owner is switching back to Codex.
+
+
 This is a snapshot for the next coding session. `README.md` is the product scope and engineering source of truth; `PROGRESS.md` tracks verification and remaining work. `CLAUDE.md` has the repo conventions. No application change is requested by this handoff itself.
 
 ## What we finished

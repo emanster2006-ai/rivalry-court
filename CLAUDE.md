@@ -1,5 +1,7 @@
 # Rivalry Court
 
+Full current context for any coding agent is in `AGENTS.md` (live URLs, architecture, deployment gotchas, decisions, open items). Read it first.
+
 Social game played alongside Fantasy Premier League: friends lock sealed win-probabilities for head-to-head duels, then resolve them from FPL scores. See `README.md` for the agreed scope and the first-release definition of done. See `PROGRESS.md` for what is built and what is next — read it first and update it when you finish work.
 
 For the 2026-10-08 takeover snapshot, read `SESSION_HANDOFF.md` after `PROGRESS.md`.
