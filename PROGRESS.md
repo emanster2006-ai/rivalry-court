@@ -56,3 +56,11 @@ Last updated: 2026-10-08. Tests: API 19 passing with PostgreSQL (18 passing and 
 - `docker compose up -d --build` now works here using the installed Compose CLI plugin; all five services started and the API health check passed.
 - Vitest was updated to 4.1.11; `npm audit` now reports zero advisories.
 - Test data in local DB: users claude-test@ and claude-test2@example.com, groups "Claude smoke test" and "UI test court".
+
+## Live deployment (2026-10-08)
+- Web: https://rivalry-court-web.onrender.com (Render static, free)
+- API: https://rivalry-court-api.onrender.com (Render Docker, free; sleeps after 15 idle minutes, ~50s to wake)
+- Database + sign-in: Supabase project `gfgbawwuwacaduneaxaa` (free); email via Brevo SMTP
+- Verified from outside: API health 200, no-token and forged-token requests get 401, CORS allows only the web origin, website bundle points at the right API/Supabase/key. API reached Live only after migrations (incl. row-level security) ran on Supabase.
+- Not yet verified: a real magic-link sign-in on the live site (needs the Supabase Site URL set to the web address and Brevo delivery working); the first duel on production.
+- Render fix history: `dockerCommand: sh -c "..."` failed with exit 127; replaced by `apps/api/start.sh`.
