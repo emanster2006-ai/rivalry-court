@@ -71,3 +71,5 @@ Last updated: 2026-10-08. Tests: API 19 passing with PostgreSQL (18 passing and 
 ## Portfolio review — 2026-10-18 UTC
 
 Added demo/ownership overview, production release checklist, and a regression test for SMTP failure rollback and successful retry. Production email and two-user flows have not been exercised in this review. Source visibility is unchanged. Changes are prepared on a review branch to avoid triggering the main-branch deployment.
+
+Validation in this review: API 24 passed, 2 PostgreSQL checks skipped locally; frontend 14 passed; API/web lint and frontend build passed. GitHub CI also passed both API (Python 3.13 with PostgreSQL) and web jobs for the review branch.
