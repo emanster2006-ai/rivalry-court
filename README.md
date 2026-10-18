@@ -2,6 +2,23 @@
 
 Rivalry Court is a social game played alongside Fantasy Premier League (FPL). Friends lock predictions before an FPL deadline, challenge each other's reasoning, and revisit the results after each gameweek. FPL remains the source of truth for teams and points; this project focuses on the decisions and rivalries around them.
 
+## Demo and current status
+
+[Open the deployed app](https://rivalry-court-web.onrender.com). The API uses a free hosting tier and may take about a minute to wake. Sign-in requires an email magic link; private groups require an invite code. The source repository remains private.
+
+Emmanuel built this project with AI assistance, including the React/TypeScript interface, FastAPI API, PostgreSQL event model, authentication integration, tests, and deployment configuration. Automated checks and previously recorded two-user use are described in [PROGRESS.md](PROGRESS.md). Production score-notice delivery, dispute/correction/void/tie/72-hour flows, and a real-phone check are still unverified.
+
+### Engineering decisions
+
+- Store prediction and score revisions as append-only events so corrections preserve history.
+- Enforce deadlines and membership on the server; hide opponent probabilities until lock.
+- Start the 72-hour confirmation window only after score-notice delivery succeeds.
+- Use manual official-score entry for this release; no automatic FPL import or AI adjudication.
+
+### Release verification
+
+Use [the release checklist](docs/RELEASE_VERIFICATION.md) for the remaining production checks. Automated tests substitute SMTP and do not prove delivery from Render to a real inbox.
+
 ## Agreed scope
 
 1. **Sealed rivalry duels — first playable release.** Two friends compare either final gameweek scores after transfer penalties or points awarded to their captain slots. Each privately submits only a probability that their own side wins; the duel type and participants determine the sides. Predictions reveal at the FPL deadline, and resolved predictions contribute to a Brier-score history.
@@ -54,3 +71,4 @@ Run `cd apps/api && python3 -m venv .venv && .venv/bin/pip install -e '.[dev]' &
 ## Next
 
 The roadmap is captain-only gameweek forks, then transfer forks and remaining FPL rules, followed by AI opposing counsel and later an AI manager. Automatic FPL import depends on a dependable, permitted source. This first release relies on an admin to enter correct deadlines and finalized official scores; it has no background worker, so auto-confirmation is computed when a duel or history is read after 72 hours. Magic-link and score email delivery need working SMTP outside local development.
+

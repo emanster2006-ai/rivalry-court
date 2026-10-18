@@ -242,3 +242,34 @@ def test_72_hour_boundary(flow):
     # The window is closed: a late confirmation is refused.
     revision = call(client, 1, "GET", path).json()["scores"][-1]["id"]
     assert call(client, 1, "POST", path + f"/scores/{revision}/confirm").status_code == 409
+
+
+
+def test_failed_score_notice_rolls_back_and_retry_saves_once(flow, monkeypatch):
+    client, _, clock, factory = flow
+    _, duel, deadline = setup_duel(flow)
+    path = f"/duels/{duel['id']}"
+    for user in (0, 1):
+        call(client, user, "POST", path + "/submissions", {"probability_pct": 50})
+    clock[0] = deadline
+
+    def fail_delivery(_addresses, _duel):
+        raise OSError("SMTP unavailable")
+
+    monkeypatch.setattr(api_module, "send_score_notice", fail_delivery)
+    assert post_score(client, 0, path, 10, 8).status_code == 503
+    from rivalry.models import Confirmation, ScoreNotice, ScoreRevision
+    with factory() as db:
+        assert db.query(ScoreRevision).count() == 0
+        assert db.query(Confirmation).count() == 0
+        assert db.query(ScoreNotice).count() == 0
+    assert call(client, 1, "GET", path).json()["status"] == "awaiting_scores"
+    deliveries = []
+    monkeypatch.setattr(api_module, "send_score_notice", lambda addresses, duel_id: deliveries.append((addresses, duel_id)))
+    assert post_score(client, 0, path, 10, 8).status_code == 201
+    assert len(deliveries) == 1
+    assert set(deliveries[0][0]) == {"person0@example.com", "person1@example.com"}
+    with factory() as db:
+        assert db.query(ScoreRevision).count() == 1
+        assert db.query(Confirmation).count() == 1
+        assert db.query(ScoreNotice).count() == 1
