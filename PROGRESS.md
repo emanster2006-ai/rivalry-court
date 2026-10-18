@@ -65,3 +65,9 @@ Last updated: 2026-10-08. Tests: API 19 passing with PostgreSQL (18 passing and 
 - Verified 2026-10-08/09: real magic-link sign-in on the live site via Brevo (first email landed in spam), a friend joined by invite code, a duel was created and predictions locked.
 - Not yet verified on production: the score-notice email sent by the API (Render → Brevo port 2525 + STARTTLS), dispute/correction/void/tie/72-hour flows, a real phone. A one-off `Database error saving new user` appeared once at sign-in (account still created); check Supabase Auth logs.
 - Render fix history: `dockerCommand: sh -c "..."` failed with exit 127; replaced by `apps/api/start.sh`.
+
+
+
+## Portfolio review — 2026-10-18 UTC
+
+Added demo/ownership overview, production release checklist, and a regression test for SMTP failure rollback and successful retry. Production email and two-user flows have not been exercised in this review. Source visibility is unchanged. Changes are prepared on a review branch to avoid triggering the main-branch deployment.
