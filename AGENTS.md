@@ -66,3 +66,9 @@ cd apps/web && npm test && npm run lint && npm run build
 - Do not sign up for services, spend money, or send email/messages without asking. Do not push to `main` unless the owner asks.
 - Prefer small commits with clear messages; run API + web tests and lint before committing.
 - Report plainly what was verified versus assumed.
+
+
+
+## Portfolio review — 2026-10-18 UTC
+
+Added demo/ownership overview, production release checklist, and a regression test for SMTP failure rollback and successful retry. Production email and two-user flows have not been exercised in this review. Source visibility is unchanged. Changes are prepared on a review branch to avoid triggering the main-branch deployment.
