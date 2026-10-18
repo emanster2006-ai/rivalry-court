@@ -73,3 +73,10 @@ Last updated: 2026-10-08. Tests: API 19 passing with PostgreSQL (18 passing and 
 Added demo/ownership overview, production release checklist, and a regression test for SMTP failure rollback and successful retry. Production email and two-user flows have not been exercised in this review. Source visibility is unchanged. Changes are prepared on a review branch to avoid triggering the main-branch deployment.
 
 Validation in this review: API 24 passed, 2 PostgreSQL checks skipped locally; frontend 14 passed; API/web lint and frontend build passed. GitHub CI also passed both API (Python 3.13 with PostgreSQL) and web jobs for the review branch.
+
+## Portfolio evidence update — 2026-10-18 UTC
+
+- Added public case study/media links, engineering decisions, reproducible browser capture, and a three-gameweek pilot protocol with feedback/retest fields.
+- Media is the actual React UI with synthetic API/auth responses. The 60-second MP4 is a captioned screenshot sequence, not live gameplay. Captured desktop and 390px layouts; no browser page errors or mobile horizontal overflow.
+- Local validation: API 24 passed with two PostgreSQL-only checks skipped; frontend 14 passed; API/web lint and frontend production build passed.
+- No new real users, invitations, emails, or production records. Production verification and multi-gameweek feedback remain open. Source remains private.

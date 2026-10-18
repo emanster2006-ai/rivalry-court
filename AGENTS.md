@@ -72,3 +72,9 @@ cd apps/web && npm test && npm run lint && npm run build
 ## Portfolio review — 2026-10-18 UTC
 
 Added demo/ownership overview, production release checklist, and a regression test for SMTP failure rollback and successful retry. Production email and two-user flows have not been exercised in this review. Source visibility is unchanged. Changes are prepared on a review branch to avoid triggering the main-branch deployment.
+
+## Portfolio evidence update — 2026-10-18 UTC
+
+Added a reproducible synthetic UI capture script, a public case study/media link, engineering tradeoffs, and a three-gameweek pilot protocol. Capture uses the real React UI with substituted auth/API responses and blocks external network requests; it does not verify production behavior or real user adoption. No invitations, emails, or live group records were created.
+
+Local checks: API 24 passed, two PostgreSQL-only tests skipped; frontend 14 passed; API/web lint and frontend production build passed. Browser capture reported no page errors and no horizontal overflow at 390px. A real-phone check and multi-gameweek pilot are still pending.

@@ -19,6 +19,13 @@ Emmanuel built this project with AI assistance, including the React/TypeScript i
 
 Use [the release checklist](docs/RELEASE_VERIFICATION.md) for the remaining production checks. Automated tests substitute SMTP and do not prove delivery from Render to a real inbox.
 
+## Explore the project
+
+- [Public case study, screenshots, and 60-second walkthrough](https://github.com/emanster2006-ai/emanster2006-ai/blob/main/projects/rivalry-court.md)
+- [Engineering decisions and tradeoffs](docs/ENGINEERING_DECISIONS.md)
+- [Three-gameweek pilot and feedback log](docs/PILOT.md)
+- [Reproduce the synthetic UI demo](docs/DEMO.md)
+
 ## Agreed scope
 
 1. **Sealed rivalry duels — first playable release.** Two friends compare either final gameweek scores after transfer penalties or points awarded to their captain slots. Each privately submits only a probability that their own side wins; the duel type and participants determine the sides. Predictions reveal at the FPL deadline, and resolved predictions contribute to a Brier-score history.
