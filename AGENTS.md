@@ -72,3 +72,7 @@ cd apps/web && npm test && npm run lint && npm run build
 ## Portfolio review — 2026-10-18 UTC
 
 Added demo/ownership overview, production release checklist, and a regression test for SMTP failure rollback and successful retry. Production email and two-user flows have not been exercised in this review. Source visibility is unchanged. Changes are prepared on a review branch to avoid triggering the main-branch deployment.
+
+## Ownership credit — 2026-10-28
+
+Added a discreet bottom-right footer in the static HTML: `© 2026 Emmanuel Ezedinma Onwuka · Rivalry Court`, plus author and description metadata. The credit is public before sign-in and readable without JavaScript; private game data and access controls are unchanged. Google indexing remains unverified and is not guaranteed. Static HTML parsing verified the exact credit and author metadata. Full local suites could not run because the executor network proxy was unreachable; check the ownership-credit PR's GitHub CI for API/web tests, lint, and build results. Live deployment verification is pending.
