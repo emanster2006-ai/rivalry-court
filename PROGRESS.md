@@ -55,7 +55,7 @@ Last updated: 2026-10-08. Tests: API 19 passing with PostgreSQL (18 passing and 
 - API container now runs uvicorn with `--reload` (it served stale code before and crashed the UI). Recreate with `docker-compose up -d api` after compose changes.
 - `docker compose up -d --build` now works here using the installed Compose CLI plugin; all five services started and the API health check passed.
 - Vitest was updated to 4.1.11; `npm audit` now reports zero advisories.
-- Test data in local DB: users claude-test@ and claude-test2@example.com, groups "Claude smoke test" and "UI test court".
+- Test data in local DB: two test users and two test groups ("smoke test" and "UI test court").
 
 ## Live deployment (2026-10-08)
 - Web: https://rivalry-court-web.onrender.com (Render static, free)

@@ -4,9 +4,9 @@ Rivalry Court is a social game played alongside Fantasy Premier League (FPL). Fr
 
 ## Demo and current status
 
-[Open the deployed app](https://rivalry-court-web.onrender.com). The API uses a free hosting tier and may take about a minute to wake. Sign-in requires an email magic link; private groups require an invite code. The source repository remains private.
+[Open the deployed app](https://rivalry-court-web.onrender.com). The API uses a free hosting tier and may take about a minute to wake. Sign-in requires an email magic link; private groups require an invite code.
 
-Emmanuel built this project with AI assistance, including the React/TypeScript interface, FastAPI API, PostgreSQL event model, authentication integration, tests, and deployment configuration. Automated checks and previously recorded two-user use are described in [PROGRESS.md](PROGRESS.md). Production score-notice delivery, dispute/correction/void/tie/72-hour flows, and a real-phone check are still unverified.
+Emmanuel built this project, including the React/TypeScript interface, FastAPI API, PostgreSQL event model, authentication integration, tests, and deployment configuration. Automated checks and previously recorded two-user use are described in [PROGRESS.md](PROGRESS.md). Production score-notice delivery, dispute/correction/void/tie/72-hour flows, and a real-phone check are still unverified.
 
 ### Engineering decisions
 
