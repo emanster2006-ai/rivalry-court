@@ -1,0 +1,47 @@
+# Keeps the free Supabase project from pausing after a week without activity,
+# and checks that the deployed API still starts. A failed run means the live
+# demo is down: GitHub emails the repository owner.
+name: Keep alive
+
+on:
+  schedule:
+    - cron: '17 13 * * 1,4' # Mondays and Thursdays, 13:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SUPABASE_URL: https://gfgbawwuwacaduneaxaa.supabase.co
+  # Publishable key: designed to be public, and already in render.yaml.
+  SUPABASE_PUBLISHABLE_KEY: sb_publishable_4n9geyttC98T2zyjwnqSWA_GG0MM8s2
+  API_URL: https://rivalry-court-api.onrender.com
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Query the database through Supabase's REST API
+        run: |
+          # Row-level security has no policies, so a real query runs and returns no rows.
+          status=$(curl -sS -o body.json -w '%{http_code}' --max-time 60 --retry 3 --retry-all-errors \
+            -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+            "$SUPABASE_URL/rest/v1/groups?select=id&limit=1") || status=000
+          echo "HTTP $status: $(head -c 300 body.json 2>/dev/null)"
+          case "$status" in
+            200)
+              if [ "$(tr -d '[:space:]' < body.json)" != "[]" ]; then
+                echo "::error::The public REST API returned rows; row-level security is not hiding data."
+                exit 1
+              fi ;;
+            401|403) echo "Database reached; the publishable key has no table access." ;;
+            *)
+              echo "::error::Supabase did not answer (HTTP $status). If the project is paused, restore it in the Supabase dashboard."
+              exit 1 ;;
+          esac
+
+      - name: Wake the API and check health
+        run: |
+          # The free Render service sleeps when idle and takes about a minute to start.
+          curl -fsS --max-time 120 --retry 3 --retry-all-errors --retry-delay 10 "$API_URL/health"

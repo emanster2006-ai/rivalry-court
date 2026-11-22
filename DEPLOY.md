@@ -7,7 +7,7 @@ Checked against the providers' own pages where possible; blog comparisons disagr
 |---|---|---|
 | Render free web service | 750 instance hours/month, 1 instance, sleeps after 15 idle minutes (about 1 minute to wake) | **Outbound SMTP ports 25, 465, 587 are blocked**, so the API cannot send score emails on them; files vanish on restart |
 | Render free Postgres | 1 GB | **Expires after 30 days, deleted after a 14-day grace period.** Not usable for real history |
-| Supabase Free | Auth + Postgres, 500 MB, 50,000 monthly users, two free projects | Built-in email sender only allows 2 messages/hour and only to team members, so custom SMTP is required; inactivity pausing is not stated on the pages I read (check) |
+| Supabase Free | Auth + Postgres, 500 MB, 50,000 monthly users, two free projects | Built-in email sender only allows 2 messages/hour and only to team members, so custom SMTP is required; projects pause after about a week without activity (see the keep-alive below) |
 | Brevo free SMTP | About 300 emails/day (from search results; the official page could not be read) | Needs an account; confirm which SMTP ports it supports |
 | Oracle Cloud always-free VM | Runs the whole Docker Compose stack as-is | Needs a card for sign-up; you manage the server and its security |
 
@@ -16,11 +16,9 @@ Supabase Free (sign-in + database) + Render free web service (API) + a free stat
 Open items before this works:
 1. ~~Token verification~~ **Done:** new Supabase projects sign tokens with public keys (docs: signing keys, ES256). Set `AUTH_JWKS_URL=https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json` on the API and it verifies against Supabase's published keys (the shared secret is then rejected). Without that setting the local GoTrue shared-secret mode is used. Covered by tests with a forged-token case; not yet tried against a real Supabase project.
 2. The API sends score notices over SMTP from Render. Use a provider port that Render does not block (2525 if offered) or switch to the provider's web API.
-3. Keep Supabase's database from pausing, and expect about a minute of delay on the first request after the API sleeps.
+3. ~~Keep Supabase's database from pausing~~ **Done:** free projects pause after about a week without activity. `.github/workflows/keep-alive.yml` runs a database query through the REST API on Mondays and Thursdays, checks that row-level security still returns no rows, and wakes the API. A failed run means the demo is down; restore the project in the Supabase dashboard, then redeploy the API on Render. Scheduled workflows only run on the default branch, and GitHub turns them off after 60 days without repository activity, so re-enable it under Actions if that happens. Expect about a minute of delay on the first request after the API sleeps.
 
 **Not recommended:** hosting everything on Render's free tier (the database disappears), or Fly.io (no real free tier now).
-
-**Accounts:** signing up for these services has to be done by you; I cannot create accounts.
 
 Nothing here has been run against a real host yet. It is a checklist for the first deployment.
 
