@@ -5,7 +5,8 @@ Use two consenting participants in a dedicated test group. Keep real group recor
 | Flow | Expected evidence | Current production status |
 | --- | --- | --- |
 | Sign-in, join, duel, lock | Two users see their own predictions only before deadline | Previously recorded as verified |
-| Score notice | Both recipients receive the correct duel link; 72h clock begins after successful send | Unverified |
+| Score notice delivery | Notices to both participants contain the correct duel link | Two notices addressed to different recipients contained the same production duel link on 2026-10-09. Current delivery needs a fresh check. |
+| Score-notice link after sign-in | A signed-out participant signs in and lands on the linked duel, including when another group is their default | Unverified on production |
 | Dispute and correction | Dispute pauses resolution; new revision preserves earlier values and resets review | Unverified |
 | Void | Admin supplies reason; later submissions rejected; duel omitted from scored statistics | Unverified |
 | Tie | Final equal scores void duel and do not alter Brier average | Unverified |
