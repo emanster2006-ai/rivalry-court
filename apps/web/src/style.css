@@ -5,3 +5,44 @@
 
 /* Comfortable tap targets on touch screens */
 @media(pointer:coarse),(max-width:760px){button.text-button,summary{display:inline-flex;align-items:center;min-height:44px}button.text-button{padding:0 8px}summary{cursor:pointer}details>summary{display:flex}li a{display:inline-flex;align-items:center;min-height:44px}}
+
+.dashboard-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.dashboard-heading h1 { margin: 0; overflow-wrap: anywhere }
+.dashboard-controls { display: flex; flex-wrap: wrap; gap: 8px }
+.dashboard-controls select { width: auto; max-width: 100% }
+.featured-duel {
+  grid-column: 1 / -1;
+  background: #f9fcf7;
+  border-color: #a6c3aa;
+  border-top: 4px solid #276649;
+}
+.duel .duel-action { color: #173f32; font-size: clamp(1.5rem, 4vw, 2.25rem); margin: 0 }
+.duel .matchup { font-weight: 700 }
+.duel .matchup em { color: #5b6e61; font-style: normal }
+.duel-result {
+  display: grid;
+  justify-items: start;
+  gap: 5px;
+  padding: 14px;
+  background: #f1f6ee;
+  border-radius: 10px;
+}
+.duel-result .result-title { color: #173f32; font-size: 1.25rem; font-weight: 700 }
+.duel-result .result-score { overflow-wrap: anywhere }
+.duel-result .result-score strong { padding: 0 4px; white-space: nowrap }
+.duel-result a { display: inline-flex; align-items: center; min-height: 44px }
+.predictions span { overflow-wrap: anywhere }
+.share-result { display: grid; justify-items: start; gap: 8px }
+.share-result label { width: 100% }
+.rematch { border-top: 1px solid #e7ebe5; padding-top: 12px }
+.rematch-form { display: grid; gap: 12px; margin-top: 14px }
+.new-duel, .group-settings { margin-top: 16px }
+.group-settings > summary { padding: 4px 0 }
+.group-settings > .group-controls { margin-top: 16px; max-width: 480px }
