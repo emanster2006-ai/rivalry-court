@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { beforeEach, expect, test, vi } from 'vitest'
 import App from './App'
 import { api, auth } from './client'
@@ -11,7 +11,11 @@ vi.mock('./client', () => ({
   api: vi.fn(),
 }))
 
-beforeEach(() => { cleanup(); vi.clearAllMocks() })
+beforeEach(() => {
+  cleanup()
+  vi.clearAllMocks()
+  window.history.replaceState(null, '', '/')
+})
 
 test('email sign-in uses a magic link', async () => {
   vi.mocked(auth.getSession).mockResolvedValue({ data: { session: null }, error: null })
@@ -40,7 +44,8 @@ test('a participant can see and revise only their own pre-deadline probability',
   expect(screen.getByText(/rival_1: Sealed/)).toBeTruthy()
   expect(screen.queryByText(/a@example.com/)).toBeNull()
   fireEvent.change(screen.getByLabelText('Your win probability'), { target: { value: '75' } })
-  fireEvent.click(screen.getByText('Lock / revise'))
+  expect(screen.getByText('60% saved · editable until the deadline')).toBeTruthy()
+  fireEvent.click(screen.getByText('Update prediction'))
   await waitFor(() => expect(api).toHaveBeenCalledWith('/duels/duel/submissions', 'POST', { probability_pct: 75 }))
 })
 
@@ -97,8 +102,53 @@ test('a member can save a username for the duel display', async () => {
   fireEvent.change(screen.getByLabelText('Username'), { target: { value: 'Captain_E' } })
   fireEvent.click(screen.getByText('Save permanently'))
   await waitFor(() => expect(api).toHaveBeenCalledWith('/me', 'PATCH', { username: 'Captain_E' }))
-  await screen.findByText(/It can't be changed/)
+  await screen.findByText('captain_e')
   // Once chosen, the form is gone, so the name cannot be edited.
   expect(screen.queryByLabelText('Username')).toBeNull()
   expect(screen.queryByText('Save permanently')).toBeNull()
+})
+
+test('the dashboard puts the earliest unsubmitted prediction first', async () => {
+  vi.mocked(auth.getSession).mockResolvedValue({ data: { session: { access_token: 'test' } }, error: null } as never)
+  const open = { group_id: 'group', claim_type: 'gameweek_points', member_a_id: 'a', member_b_id: 'b',
+    status: 'open', probabilities: {}, scores: [], void_reason: null }
+  vi.mocked(api).mockImplementation(async path => {
+    if (path === '/me') return { id: 'a', username: 'player_a', display_name: 'player_a' }
+    if (path === '/groups') return [{ id: 'group', name: 'Friends', role: 'member' }]
+    if (path.endsWith('/members')) return [{ id: 'a', display_name: 'player_a' }, { id: 'b', display_name: 'player_b' }]
+    if (path.endsWith('/duels')) return [
+      { ...open, id: 'later', gameweek: 'GW9', deadline_at: new Date(Date.now() + 1200000).toISOString() },
+      { ...open, id: 'soon', gameweek: 'GW8', deadline_at: new Date(Date.now() + 600000).toISOString() },
+    ]
+    return {}
+  })
+  render(<App />)
+  await screen.findByRole('heading', { name: 'Make your pick' })
+  const cards = screen.getAllByRole('article')
+  expect(within(cards[0]).getByText('GW8')).toBeTruthy()
+  expect(cards).toHaveLength(2)
+})
+
+test('a score-notice link opens the correct duel in a different group', async () => {
+  window.history.replaceState(null, '', '/?duel=review-duel')
+  vi.mocked(auth.getSession).mockResolvedValue({ data: { session: { access_token: 'test' } }, error: null } as never)
+  const score = { id: 'rev', score_a: 72, score_b: 65, source_url: 'https://fantasy.premierleague.com/',
+    created_at: new Date().toISOString(), entered_by: 'b', responses: [] }
+  const duel = { id: 'review-duel', group_id: 'second', claim_type: 'gameweek_points', member_a_id: 'a',
+    member_b_id: 'b', gameweek: 'GW8', status: 'awaiting_confirmation', probabilities: { a: 60, b: 45 },
+    scores: [score], void_reason: null, deadline_at: new Date(Date.now() - 600000).toISOString() }
+  vi.mocked(api).mockImplementation(async path => {
+    if (path === '/me') return { id: 'a', username: 'player_a', display_name: 'player_a' }
+    if (path === '/groups') return [{ id: 'first', name: 'First court' }, { id: 'second', name: 'Second court' }]
+    if (path === '/duels/review-duel') return duel
+    if (path === '/groups/second/duels') return [{ ...duel, id: 'other-duel', gameweek: 'GW9' }, duel]
+    if (path.endsWith('/members')) return [{ id: 'a', display_name: 'player_a' }, { id: 'b', display_name: 'player_b' }]
+    return {}
+  })
+  render(<App />)
+  await screen.findByRole('heading', { name: 'Review your result' })
+  expect(screen.getByRole('heading', { name: 'Second court' })).toBeTruthy()
+  expect(within(screen.getAllByRole('article')[0]).getByText('GW8')).toBeTruthy()
+  expect(within(screen.getAllByRole('article')[0]).getByRole('button', { name: 'Confirm score' })).toBeTruthy()
+  expect(api).not.toHaveBeenCalledWith('/groups/first/duels')
 })

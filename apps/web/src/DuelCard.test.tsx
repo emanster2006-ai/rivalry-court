@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, expect, test, vi } from 'vitest'
 import type { Duel, Person } from './client'
 import { DuelCard } from './DuelCard'
@@ -31,7 +31,7 @@ test('after the deadline both probabilities are shown and nobody can revise', ()
   renderCard(duel({}), a, false)
   expect(screen.getByText(/captain_e: 60%/)).toBeTruthy()
   expect(screen.getByText(/rival_1: 45%/)).toBeTruthy()
-  expect(screen.queryByText('Lock / revise')).toBeNull()
+  expect(screen.queryByRole('slider')).toBeNull()
 })
 
 test('only an admin sees score entry, and it posts both values with the source', () => {
@@ -51,6 +51,8 @@ test('a non-admin does not get score entry', () => {
 
 test('a participant can confirm the latest score', () => {
   const act = renderCard(duel({ status: 'awaiting_confirmation', scores: [revision] }), b, false)
+  expect(screen.getByText('70–62')).toBeTruthy()
+  expect(screen.queryByText('captain_e won')).toBeNull()
   fireEvent.click(screen.getByText('Confirm score'))
   expect(act).toHaveBeenCalledWith('/duels/duel/scores/rev/confirm')
 })
@@ -88,4 +90,44 @@ test('the slider starts at the saved probability and updates after a revision', 
   expect(slider.value).toBe('85')
   rerender(<DuelCard duel={{ ...open, probabilities: { a: 80 } }} me={a} members={members} admin={false} busy={false} act={act} />)
   expect(slider.value).toBe('80')
+})
+
+test('a resolved result shows the winner, score, both predictions and source', () => {
+  renderCard(duel({ status: 'resolved', scores: [revision] }), a, false)
+  expect(screen.getByText('You won')).toBeTruthy()
+  expect(screen.getByText('70–62')).toBeTruthy()
+  expect(screen.getByText('You gave yourself a 60% chance of winning.')).toBeTruthy()
+  expect(screen.getByText('rival_1: 45%')).toBeTruthy()
+  expect(screen.getByRole('link', { name: 'Official FPL score' }).getAttribute('href')).toBe(revision.source_url)
+})
+
+test('a result can be shared using its existing group-protected duel link', async () => {
+  const writeText = vi.fn().mockResolvedValue(undefined)
+  const clipboard = vi.spyOn(window, 'navigator', 'get').mockReturnValue({ clipboard: { writeText } } as unknown as Navigator)
+  try {
+    renderCard(duel({ status: 'resolved', scores: [revision] }), a, false)
+    fireEvent.click(screen.getByRole('button', { name: 'Copy result link' }))
+    expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/?duel=duel`)
+    await screen.findByText('Link copied. Group members can open it.')
+  } finally {
+    clipboard.mockRestore()
+  }
+})
+
+test('a rematch keeps the participants and claim but asks for a new gameweek and deadline', async () => {
+  const onRematch = vi.fn().mockResolvedValue(true)
+  render(<DuelCard duel={duel({ claim_type: 'captain_points', status: 'resolved', scores: [revision] })}
+    me={a} members={members} admin busy={false} act={vi.fn()} onRematch={onRematch} />)
+  fireEvent.click(screen.getByRole('button', { name: 'Set up rematch' }))
+  const deadline = '2026-12-09T18:30'
+  expect((screen.getByLabelText('FPL deadline') as HTMLInputElement).value).toBe('')
+  expect(screen.queryByLabelText('Side A')).toBeNull()
+  fireEvent.change(screen.getByLabelText('Gameweek'), { target: { value: 'GW9' } })
+  fireEvent.change(screen.getByLabelText('FPL deadline'), { target: { value: deadline } })
+  fireEvent.click(screen.getByRole('button', { name: 'Create rematch' }))
+  expect(onRematch).toHaveBeenCalledWith({
+    member_a_id: 'a', member_b_id: 'b', claim_type: 'captain_points', gameweek: 'GW9',
+    deadline_at: new Date(deadline).toISOString(),
+  })
+  await waitFor(() => expect(screen.queryByLabelText('FPL deadline')).toBeNull())
 })

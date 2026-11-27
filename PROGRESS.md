@@ -77,3 +77,12 @@ Validation in this review: API 24 passed, 2 PostgreSQL checks skipped locally; f
 ## Ownership credit — 2026-10-28
 
 Added a discreet bottom-right footer in the static HTML: `© 2026 Emmanuel Ezedinma Onwuka · Rivalry Court`, plus author and description metadata. The credit is public before sign-in and readable without JavaScript; private game data and access controls are unchanged. Google indexing remains unverified and is not guaranteed. Static HTML parsing verified the exact credit and author metadata. Full local suites could not run because the executor network proxy was unreachable; check the ownership-credit PR's GitHub CI for API/web tests, lint, and build results. Live deployment verification is pending.
+
+## Weekly duel flow — 2026-11-26
+
+- The dashboard highlights the first action due, starting with an unsubmitted prediction nearest its deadline. Saved predictions show their edit window.
+- Duels show the latest official score and source, and resolved duels show the winner and a copyable link. Score-notice links open the indicated duel in its group.
+- Admins can start a rematch with the same players and claim type, then supply a new gameweek and official deadline.
+- Local verification passed for 19 web tests, frontend lint and production build, and API lint. Of the 26 API tests, 24 passed and the two PostgreSQL-only tests were skipped locally. Chrome with test data exercised prediction, result links, and rematch at 1,200px and 375px wide.
+- A separate local run with PostgreSQL, GoTrue, and Mailpit exercised real email delivery to two test addresses. At 375px, a signed-out participant followed the score email, signed in by magic link, and landed in the linked duel in a non-default group. The participant disputed, the admin corrected the score, and the participant confirmed the revised result.
+- On 2026-11-26, the production API returned a healthy status. A mailbox review found two score notices addressed to different recipients with the same production duel link on 2026-10-09. A fresh live delivery check, the hosted signed-out redirect, and a two-player phone pilot are still open.
